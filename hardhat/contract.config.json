@@ -1,1 +1,8 @@
-{"minimalContract":{"artifactsPath":"0-MinimalContract.sol/MinimalContract.json","name":"MinimalContract","ctor":[],"jsonName":"minimal_contract"}}
+{
+  "gelatoSuperApp": {
+    "artifactsPath": "GelatoSuperApp.sol/GelatoSuperApp.json",
+    "name": "GelatoSuperApp",
+    "ctor": [],
+    "jsonName": "gelato_super_app"
+  }
+}
