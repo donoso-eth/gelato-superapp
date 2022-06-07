@@ -2,7 +2,7 @@
   "gelatoSuperApp": {
     "artifactsPath": "GelatoSuperApp.sol/GelatoSuperApp.json",
     "name": "GelatoSuperApp",
-    "ctor": [],
+    "ctor": ["0xEB796bdb90fFA0f28255275e16936D25d3418603","0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f","0xB3f5503f93d5Ef84b06993a1975B9D21B962892F"],
     "jsonName": "gelato_super_app"
   }
 }

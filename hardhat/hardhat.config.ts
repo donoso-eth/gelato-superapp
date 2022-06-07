@@ -30,7 +30,7 @@ if (existsSync('./typechain-types')) {
 const mainnetGwei = 21;
 
 
-const defaultNetwork = 'localhost';
+const defaultNetwork = 'mumbai';
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -121,8 +121,7 @@ const config: HardhatUserConfig = {
           : [],
     },
     mumbai: {
-      url: `https://speedy-nodes-nyc.moralis.io/${MORALIS_ID}/polygon/mumbai`, // <---- YOUR MORALIS ID! (not limited to infura)
-      // `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID_MUMBAI}`
+     url: process.env.MUMBAI_URL || "",
       gasPrice: 1000000000,
           accounts:
         process.env['DEPLOYER_KEY'] !== undefined

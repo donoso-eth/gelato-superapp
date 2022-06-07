@@ -1,6 +1,9 @@
 import { Contract, providers, Signer, utils } from "ethers";
 import { readFileSync } from "fs-extra";
+import { initEnv, waitForTx } from "../helpers/utils";
 import { join } from "path";
+import * as hre from "hardhat"
+import { GelatoSuperApp__factory } from "../typechain-types";
 
 const contract_path_relative = '../src/assets/contracts/';
 const processDir = process.cwd()
@@ -10,30 +13,14 @@ const contract_config = JSON.parse(readFileSync( join(processDir,'contract.confi
 
 const tinker = async () => {
 
-    // ADDRESS TO MINT TO:
-    
-    const toDeployContract = contract_config["minimalContract"]
-   
-    if (toDeployContract == undefined){
-      console.error("Your contract is not yet configured")
-      console.error('Please add the configuration to /hardhat/contract.config.json')
-      return
-      
-    }
-    
-    const provider = new providers.JsonRpcProvider();
-    const signer:Signer = await provider.getSigner()
+  const [deployer] = await initEnv(hre)
 
-    const metadata = JSON.parse(readFileSync(`${contract_path}/${toDeployContract.jsonName}_metadata.json`,'utf-8'))
-  
-  
-   const yourContract:Contract = await  new Contract(metadata.address,metadata.abi,signer)
-   const contractAdress = await yourContract.address
-   const deployAdress = await signer.getAddress()
+  console.log(deployer.address)
+  const gelatoSuperApp = GelatoSuperApp__factory.connect("0x4F687da9F2E54F657684cb362931499159D59545", deployer)
 
-    console.log(`Contract address: ${contractAdress}`)
+  let  receipt = await waitForTx( gelatoSuperApp.startTask());
 
-  
+  console.log(receipt.transactionHash)
   
   };
   
