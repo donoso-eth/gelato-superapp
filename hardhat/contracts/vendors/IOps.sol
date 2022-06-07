@@ -3,6 +3,8 @@ pragma solidity ^0.8.0;
 
 interface IOps {
 
+     function gelato() external view returns (address payable);
+
      function createTimedTask(
         uint128 _startTime,
         uint128 _interval,

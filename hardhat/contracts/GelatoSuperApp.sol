@@ -9,17 +9,26 @@ import {SuperAppBase} from "@superfluid-finance/ethereum-contracts/contracts/app
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract GelatoSuperApp is SuperAppBase{
+
+import { OpsReady } from "./vendors/OpsReady.sol";
+import { IOps } from "./vendors/IOps.sol";
+
+contract GelatoSuperApp is SuperAppBase, OpsReady  {
     using SafeMath for uint256;
     using Counters for Counters.Counter;
     
+    uint lastExecuted;
+    uint count;
     
     ISuperfluid public host; // host
     IConstantFlowAgreementV1 public cfa; // the stored constant flow agreement class address
     ISuperToken superToken;
 
-    constructor(ISuperfluid _host, ISuperToken _superToken) {
+   
+
+    constructor(ISuperfluid _host, ISuperToken _superToken,address payable _ops) OpsReady(_ops) {
         host = _host;
+
         superToken = _superToken;
         cfa = IConstantFlowAgreementV1(
             address(
@@ -53,13 +62,47 @@ contract GelatoSuperApp is SuperAppBase{
         _;
     }
 
-    modifier onlyExpected(ISuperToken superToken, address agreementClass) {
-        require(_isSameToken(superToken), "RedirectAll: not accepted token");
+    modifier onlyExpected(ISuperToken _superToken, address agreementClass) {
+        require(_isSameToken(_superToken), "RedirectAll: not accepted token");
         require(_isCFAv1(agreementClass), "RedirectAll: only CFAv1 supported");
         _;
     }
 
     // endregion
+
+
+    function startTask() external {
+        IOps(ops).createTask(
+            address(this), 
+            this.increaseCount.selector,
+            address(this),
+            abi.encodeWithSelector(this.checker.selector)
+        );
+    }
+    
+    function increaseCount(uint256 amount) external onlyOps {
+        require(
+            ((block.timestamp - lastExecuted) > 180),
+            "Counter: increaseCount: Time not elapsed"
+        );
+
+        count += amount;
+        lastExecuted = block.timestamp;
+    }
+    
+    function checker()
+        external
+        view
+        returns (bool canExec, bytes memory execPayload)
+    {
+        canExec = (block.timestamp - lastExecuted) > 180;
+
+        execPayload = abi.encodeWithSelector(
+            this.increaseCount.selector,
+            uint256(100)
+        );
+    }
+
 
 
     /**************************************************************************
