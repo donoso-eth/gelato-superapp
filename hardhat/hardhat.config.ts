@@ -121,7 +121,7 @@ const config: HardhatUserConfig = {
           : [],
     },
     mumbai: {
-     url: process.env.MUMBAI_URL || "",
+      url: `https://polygon-mumbai.g.alchemy.com/v2/P2lEQkjFdNjdN0M_mpZKB8r3fAa2M0vT`,
       gasPrice: 1000000000,
           accounts:
         process.env['DEPLOYER_KEY'] !== undefined

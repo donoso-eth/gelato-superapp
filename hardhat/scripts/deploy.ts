@@ -11,6 +11,8 @@ import config from "../hardhat.config";
 import { join } from "path";
 import { createHardhatAndFundPrivKeysFiles } from "../helpers/localAccounts";
 import * as hre from 'hardhat';
+import { GelatoSuperApp__factory } from "../typechain-types";
+import { initEnv } from "../helpers/utils";
 
 let HOST = '0xEB796bdb90fFA0f28255275e16936D25d3418603';
 let CFA = '0x49e565Ed1bdc17F3d220f72DF0857C26FA83F873';
@@ -29,8 +31,10 @@ const processDir = process.cwd()
 const contract_path = join(processDir,contract_path_relative)
 ensureDir(contract_path)
 
-async function main() {
 
+
+async function main() {
+  const [deployer] = await initEnv(hre)
 let network = hardhatArguments.network;
 if (network == undefined) {
   network = config.defaultNetwork;
@@ -62,11 +66,14 @@ if (network == undefined) {
       `./artifacts/contracts/${toDeployContract.artifactsPath}`
     );
     const Metadata = JSON.parse(readFileSync(artifactsPath, 'utf-8'));
-    const Contract = await ethers.getContractFactory(toDeployContract.name);
-    const contract = await Contract.deploy.apply(
-      Contract,
-      toDeployContract.ctor
-    );
+    // const Contract = await ethers.getContractFactory(toDeployContract.name);
+    // const contract = await Contract.deploy.apply(
+    //   Contract,
+    //   toDeployContract.ctor
+    // );
+
+
+    const gelatoSuperApp = await new GelatoSuperApp__factory(deployer).deploy("0xEB796bdb90fFA0f28255275e16936D25d3418603","0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f","0xB3f5503f93d5Ef84b06993a1975B9D21B962892F")
 
    
     //const signer:Signer = await hre.ethers.getSigners()
@@ -76,14 +83,14 @@ if (network == undefined) {
       JSON.stringify({
         abi: Metadata.abi,
         name: toDeployContract.name,
-        address: contract.address,
+        address: gelatoSuperApp.address,
         network: network,
       })
     );
 
     console.log(
       toDeployContract.name + ' Contract Deployed to:',
-      contract.address
+      gelatoSuperApp.address
     );
 
     ///// copy Interfaces and create Metadata address/abi to assets folder

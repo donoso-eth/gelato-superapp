@@ -5,6 +5,7 @@ import { join } from "path";
 import * as hre from "hardhat"
 import { GelatoSuperApp__factory } from "../typechain-types";
 
+
 const contract_path_relative = '../src/assets/contracts/';
 const processDir = process.cwd()
 const contract_path = join(processDir,contract_path_relative)
@@ -16,9 +17,26 @@ const tinker = async () => {
   const [deployer] = await initEnv(hre)
 
   console.log(deployer.address)
-  const gelatoSuperApp = GelatoSuperApp__factory.connect("0x4F687da9F2E54F657684cb362931499159D59545", deployer)
 
-  let  receipt = await waitForTx( gelatoSuperApp.startTask());
+  const deployContract="gelatoSuperApp"
+  const toDeployContract = contract_config[deployContract];
+  const metadata = JSON.parse(readFileSync(`${contract_path}/${toDeployContract.jsonName}_metadata.json`,'utf-8'))
+  
+  console.log(metadata.address)
+  const gelatoSuperApp = GelatoSuperApp__factory.connect(metadata.address, deployer)
+
+
+  //let  receipt = await waitForTx( gelatoSuperApp.startTask({value:utils.parseEther("0.1")}));
+
+
+  // 
+
+     let  receipt = await waitForTx( gelatoSuperApp.cancelTask());
+
+
+  // 
+
+   receipt = await waitForTx( gelatoSuperApp.withdraw());
 
   console.log(receipt.transactionHash)
   

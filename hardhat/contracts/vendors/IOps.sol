@@ -47,4 +47,14 @@ interface IOps {
     /// @notice Cancel a task so that Gelato can no longer execute it
     /// @param _taskId The hash of the task, can be computed using getTaskId()
     function cancelTask(bytes32 _taskId) external;
+
+        /// @notice Helper func to query fee and feeToken
+    function getFeeDetails() external view returns (uint256, address);
+
+    /// @notice Helper func to query all open tasks by a task creator
+    /// @param _taskCreator Address who created the task
+    function getTaskIdsByUser(address _taskCreator)
+        external
+        view
+        returns (bytes32[] memory);
 }
