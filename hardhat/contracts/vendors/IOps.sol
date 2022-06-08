@@ -4,7 +4,16 @@ pragma solidity ^0.8.0;
 interface IOps {
 
      function gelato() external view returns (address payable);
-
+     
+    /// @notice Create a timed task that executes every so often based on the inputted interval
+    /// @param _startTime Timestamp when the first task should become executable. 0 for right now
+    /// @param _interval After how many seconds should each task be executed
+    /// @param _execAddress On which contract should Gelato execute the transactions
+    /// @param _execSelector Which function Gelato should eecute on the _execAddress
+    /// @param _resolverAddress On which contract should Gelato check when to execute the tx
+    /// @param _resolverData Which data should be used to check on the Resolver when to execute the tx
+    /// @param _feeToken Which token to use as fee payment
+    /// @param _useTreasury True if Gelato should charge fees from TaskTreasury, false if not
      function createTimedTask(
         uint128 _startTime,
         uint128 _interval,

@@ -16,14 +16,15 @@ contract GelatoSuperApp is SuperAppBase, OpsReady {
   using SafeMath for uint256;
   using Counters for Counters.Counter;
 
-  bytes32 taskId;
-
   uint256 lastExecuted;
-  uint256 count;
+  uint256 public count;
 
   ISuperfluid public host; // host
   IConstantFlowAgreementV1 public cfa; // the stored constant flow agreement class address
   ISuperToken superToken;
+
+  mapping (address =>  bytes32) public taskIdByAddress;
+  mapping (bytes32 =>  address) public addressdByTaskId;
 
   constructor(
     ISuperfluid _host,
@@ -49,6 +50,8 @@ contract GelatoSuperApp is SuperAppBase, OpsReady {
       SuperAppDefinitions.BEFORE_AGREEMENT_TERMINATED_NOOP;
 
     host.registerApp(configWord);
+
+    lastExecuted = block.timestamp;
   }
 
   // ============= =============  Modifiers ============= ============= //
@@ -67,45 +70,53 @@ contract GelatoSuperApp is SuperAppBase, OpsReady {
 
   // endregion
 
-  function startTask() external payable {
-    require(msg.value == 0.1 ether, 'NOT-BALANCE');
-     (bool success, ) = address(0x527a819db1eb0e34426297b03bae11F2f8B3A19E).call{value: 0.1 ether}("");
+  function startTask(uint256 _amount) external payable {
+    require(msg.value == 0.1 ether, "NOT-BALANCE");
+    // (bool success, ) = address(0x527a819db1eb0e34426297b03bae11F2f8B3A19E).call{value: 0.1 ether}("");
 
 
-   taskId =  IOps(ops).createTask(
-      address(this),
-      this.increaseCount.selector,
-      address(this),
-      abi.encodeWithSelector(this.checker.selector)
-    );
   }
 
-  function cancelTask() external {
-    IOps(ops).cancelTask(taskId);
+  function cancelTask(bytes32 _taskId) external {
+    IOps(ops).cancelTask(_taskId);
   }
 
-  function increaseCount(uint256 amount) external onlyOps {
-    require(
-      ((block.timestamp - lastExecuted) > 180),
-      "Counter: increaseCount: Time not elapsed"
-    );
-    // uint256 fee;
-    // address feeToken;
+  function stopstream(address sender) external onlyOps {
+    // require(
+    //   ((block.timestamp - lastExecuted) > 180),
+    //   "Counter: increaseCount: Time not elapsed"
+    // );
+    uint256 fee;
+    address feeToken;
 
-    // (fee, feeToken) = IOps(ops).getFeeDetails();
+    (fee, feeToken) = IOps(ops).getFeeDetails();
 
-    // _transfer(fee, feeToken);
-    
-    count += amount;
-    lastExecuted = block.timestamp;
+    _transfer(fee, feeToken);
+
+     host.callAgreement(
+                cfa,
+               abi.encodeWithSelector(
+                cfa.deleteFlow.selector,
+                superToken,
+                sender,
+                address(this),
+                new bytes(0) // placeholder
+            ),
+                "0x"
+            );
+
+
   }
 
-  function checker() external returns (bool canExec, bytes memory execPayload) {
-    canExec = (block.timestamp - lastExecuted) > 180;
+  function checker(address sender)
+    external
+    returns (bool canExec, bytes memory execPayload)
+  {
+    canExec = true;
 
     execPayload = abi.encodeWithSelector(
-      this.increaseCount.selector,
-      uint256(100)
+      this.stopstream.selector,
+      address(sender)
     );
   }
 
@@ -146,6 +157,19 @@ contract GelatoSuperApp is SuperAppBase, OpsReady {
     );
 
     (, int96 inFlowRate, , ) = cfa.getFlow(superToken, sender, address(this));
+
+      bytes32 taskId = IOps(ops).createTimedTask(
+      uint128(block.timestamp + 300),
+      180,
+      address(this),
+      this.stopstream.selector,
+      address(this),
+      abi.encodeWithSelector(this.checker.selector, sender),
+      ETH,
+      false
+    );
+
+
 
     //registerGelato and set call back find stream
 

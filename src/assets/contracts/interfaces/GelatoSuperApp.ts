@@ -21,24 +21,31 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface GelatoSuperAppInterface extends utils.Interface {
   functions: {
     "ETH()": FunctionFragment;
+    "addressdByTaskId(bytes32)": FunctionFragment;
     "afterAgreementCreated(address,address,bytes32,bytes,bytes,bytes)": FunctionFragment;
     "afterAgreementTerminated(address,address,bytes32,bytes,bytes,bytes)": FunctionFragment;
     "afterAgreementUpdated(address,address,bytes32,bytes,bytes,bytes)": FunctionFragment;
     "beforeAgreementCreated(address,address,bytes32,bytes,bytes)": FunctionFragment;
     "beforeAgreementTerminated(address,address,bytes32,bytes,bytes)": FunctionFragment;
     "beforeAgreementUpdated(address,address,bytes32,bytes,bytes)": FunctionFragment;
-    "cancelTask()": FunctionFragment;
+    "cancelTask(bytes32)": FunctionFragment;
     "cfa()": FunctionFragment;
-    "checker()": FunctionFragment;
+    "checker(address)": FunctionFragment;
+    "count()": FunctionFragment;
     "gelato()": FunctionFragment;
     "host()": FunctionFragment;
-    "increaseCount(uint256)": FunctionFragment;
     "ops()": FunctionFragment;
-    "startTask()": FunctionFragment;
+    "startTask(uint256)": FunctionFragment;
+    "stopstream(address)": FunctionFragment;
+    "taskIdByAddress(address)": FunctionFragment;
     "withdraw()": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "ETH", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "addressdByTaskId",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(
     functionFragment: "afterAgreementCreated",
     values: [string, string, BytesLike, BytesLike, BytesLike, BytesLike]
@@ -65,21 +72,30 @@ export interface GelatoSuperAppInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "cancelTask",
-    values?: undefined
+    values: [BytesLike]
   ): string;
   encodeFunctionData(functionFragment: "cfa", values?: undefined): string;
-  encodeFunctionData(functionFragment: "checker", values?: undefined): string;
+  encodeFunctionData(functionFragment: "checker", values: [string]): string;
+  encodeFunctionData(functionFragment: "count", values?: undefined): string;
   encodeFunctionData(functionFragment: "gelato", values?: undefined): string;
   encodeFunctionData(functionFragment: "host", values?: undefined): string;
+  encodeFunctionData(functionFragment: "ops", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "increaseCount",
+    functionFragment: "startTask",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "ops", values?: undefined): string;
-  encodeFunctionData(functionFragment: "startTask", values?: undefined): string;
+  encodeFunctionData(functionFragment: "stopstream", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "taskIdByAddress",
+    values: [string]
+  ): string;
   encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "ETH", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "addressdByTaskId",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "afterAgreementCreated",
     data: BytesLike
@@ -107,14 +123,16 @@ export interface GelatoSuperAppInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "cancelTask", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "cfa", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "checker", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "count", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "gelato", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "host", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "increaseCount",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "ops", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "startTask", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "stopstream", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "taskIdByAddress",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {};
@@ -148,6 +166,11 @@ export interface GelatoSuperApp extends BaseContract {
 
   functions: {
     ETH(overrides?: CallOverrides): Promise<[string]>;
+
+    addressdByTaskId(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<[string]>;
 
     afterAgreementCreated(
       _superToken: string,
@@ -207,29 +230,36 @@ export interface GelatoSuperApp extends BaseContract {
     ): Promise<[string]>;
 
     cancelTask(
+      _taskId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     cfa(overrides?: CallOverrides): Promise<[string]>;
 
     checker(
+      sender: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    count(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     gelato(overrides?: CallOverrides): Promise<[string]>;
 
     host(overrides?: CallOverrides): Promise<[string]>;
 
-    increaseCount(
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     ops(overrides?: CallOverrides): Promise<[string]>;
 
     startTask(
+      _amount: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    stopstream(
+      sender: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    taskIdByAddress(arg0: string, overrides?: CallOverrides): Promise<[string]>;
 
     withdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -237,6 +267,8 @@ export interface GelatoSuperApp extends BaseContract {
   };
 
   ETH(overrides?: CallOverrides): Promise<string>;
+
+  addressdByTaskId(arg0: BytesLike, overrides?: CallOverrides): Promise<string>;
 
   afterAgreementCreated(
     _superToken: string,
@@ -296,29 +328,36 @@ export interface GelatoSuperApp extends BaseContract {
   ): Promise<string>;
 
   cancelTask(
+    _taskId: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   cfa(overrides?: CallOverrides): Promise<string>;
 
   checker(
+    sender: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  count(overrides?: CallOverrides): Promise<BigNumber>;
 
   gelato(overrides?: CallOverrides): Promise<string>;
 
   host(overrides?: CallOverrides): Promise<string>;
 
-  increaseCount(
-    amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   ops(overrides?: CallOverrides): Promise<string>;
 
   startTask(
+    _amount: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  stopstream(
+    sender: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  taskIdByAddress(arg0: string, overrides?: CallOverrides): Promise<string>;
 
   withdraw(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -326,6 +365,11 @@ export interface GelatoSuperApp extends BaseContract {
 
   callStatic: {
     ETH(overrides?: CallOverrides): Promise<string>;
+
+    addressdByTaskId(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<string>;
 
     afterAgreementCreated(
       _superToken: string,
@@ -384,26 +428,28 @@ export interface GelatoSuperApp extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    cancelTask(overrides?: CallOverrides): Promise<void>;
+    cancelTask(_taskId: BytesLike, overrides?: CallOverrides): Promise<void>;
 
     cfa(overrides?: CallOverrides): Promise<string>;
 
     checker(
+      sender: string,
       overrides?: CallOverrides
     ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
+
+    count(overrides?: CallOverrides): Promise<BigNumber>;
 
     gelato(overrides?: CallOverrides): Promise<string>;
 
     host(overrides?: CallOverrides): Promise<string>;
 
-    increaseCount(
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     ops(overrides?: CallOverrides): Promise<string>;
 
-    startTask(overrides?: CallOverrides): Promise<void>;
+    startTask(_amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
+
+    stopstream(sender: string, overrides?: CallOverrides): Promise<void>;
+
+    taskIdByAddress(arg0: string, overrides?: CallOverrides): Promise<string>;
 
     withdraw(overrides?: CallOverrides): Promise<boolean>;
   };
@@ -412,6 +458,11 @@ export interface GelatoSuperApp extends BaseContract {
 
   estimateGas: {
     ETH(overrides?: CallOverrides): Promise<BigNumber>;
+
+    addressdByTaskId(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     afterAgreementCreated(
       _superToken: string,
@@ -471,28 +522,38 @@ export interface GelatoSuperApp extends BaseContract {
     ): Promise<BigNumber>;
 
     cancelTask(
+      _taskId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     cfa(overrides?: CallOverrides): Promise<BigNumber>;
 
     checker(
+      sender: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    count(overrides?: CallOverrides): Promise<BigNumber>;
 
     gelato(overrides?: CallOverrides): Promise<BigNumber>;
 
     host(overrides?: CallOverrides): Promise<BigNumber>;
 
-    increaseCount(
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     ops(overrides?: CallOverrides): Promise<BigNumber>;
 
     startTask(
+      _amount: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    stopstream(
+      sender: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    taskIdByAddress(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     withdraw(
@@ -503,6 +564,11 @@ export interface GelatoSuperApp extends BaseContract {
   populateTransaction: {
     ETH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    addressdByTaskId(
+      arg0: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     afterAgreementCreated(
       _superToken: string,
       _agreementClass: string,
@@ -561,28 +627,38 @@ export interface GelatoSuperApp extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     cancelTask(
+      _taskId: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     cfa(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     checker(
+      sender: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    count(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     gelato(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     host(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    increaseCount(
-      amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     ops(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     startTask(
+      _amount: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    stopstream(
+      sender: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    taskIdByAddress(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     withdraw(
