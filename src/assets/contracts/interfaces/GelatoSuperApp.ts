@@ -38,6 +38,7 @@ export interface GelatoSuperAppInterface extends utils.Interface {
     "startTask(uint256)": FunctionFragment;
     "stopstream(address)": FunctionFragment;
     "taskIdByAddress(address)": FunctionFragment;
+    "treasury()": FunctionFragment;
     "withdraw()": FunctionFragment;
   };
 
@@ -89,6 +90,7 @@ export interface GelatoSuperAppInterface extends utils.Interface {
     functionFragment: "taskIdByAddress",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "treasury", values?: undefined): string;
   encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "ETH", data: BytesLike): Result;
@@ -133,6 +135,7 @@ export interface GelatoSuperAppInterface extends utils.Interface {
     functionFragment: "taskIdByAddress",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "treasury", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {};
@@ -255,11 +258,13 @@ export interface GelatoSuperApp extends BaseContract {
     ): Promise<ContractTransaction>;
 
     stopstream(
-      sender: string,
+      receiver: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     taskIdByAddress(arg0: string, overrides?: CallOverrides): Promise<[string]>;
+
+    treasury(overrides?: CallOverrides): Promise<[string]>;
 
     withdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -353,11 +358,13 @@ export interface GelatoSuperApp extends BaseContract {
   ): Promise<ContractTransaction>;
 
   stopstream(
-    sender: string,
+    receiver: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   taskIdByAddress(arg0: string, overrides?: CallOverrides): Promise<string>;
+
+  treasury(overrides?: CallOverrides): Promise<string>;
 
   withdraw(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -447,9 +454,11 @@ export interface GelatoSuperApp extends BaseContract {
 
     startTask(_amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    stopstream(sender: string, overrides?: CallOverrides): Promise<void>;
+    stopstream(receiver: string, overrides?: CallOverrides): Promise<void>;
 
     taskIdByAddress(arg0: string, overrides?: CallOverrides): Promise<string>;
+
+    treasury(overrides?: CallOverrides): Promise<string>;
 
     withdraw(overrides?: CallOverrides): Promise<boolean>;
   };
@@ -547,7 +556,7 @@ export interface GelatoSuperApp extends BaseContract {
     ): Promise<BigNumber>;
 
     stopstream(
-      sender: string,
+      receiver: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -555,6 +564,8 @@ export interface GelatoSuperApp extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    treasury(overrides?: CallOverrides): Promise<BigNumber>;
 
     withdraw(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -652,7 +663,7 @@ export interface GelatoSuperApp extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     stopstream(
-      sender: string,
+      receiver: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -660,6 +671,8 @@ export interface GelatoSuperApp extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    treasury(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdraw(
       overrides?: Overrides & { from?: string | Promise<string> }

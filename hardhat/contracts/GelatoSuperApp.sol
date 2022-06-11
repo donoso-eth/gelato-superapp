@@ -9,8 +9,8 @@ import {SuperAppBase} from "@superfluid-finance/ethereum-contracts/contracts/app
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-import {OpsReady} from "./vendors/OpsReady.sol";
-import {IOps} from "./vendors/IOps.sol";
+import {OpsReady} from "./gelato/OpsReady.sol";
+import {IOps} from "./gelato/IOps.sol";
 
 contract GelatoSuperApp is SuperAppBase, OpsReady {
   using SafeMath for uint256;
@@ -29,8 +29,9 @@ contract GelatoSuperApp is SuperAppBase, OpsReady {
   constructor(
     ISuperfluid _host,
     ISuperToken _superToken,
-    address payable _ops
-  ) OpsReady(_ops) {
+    address payable _ops,
+    address _treasury
+  ) OpsReady(_ops, _treasury) {
     host = _host;
 
     superToken = _superToken;
@@ -81,11 +82,12 @@ contract GelatoSuperApp is SuperAppBase, OpsReady {
     IOps(ops).cancelTask(_taskId);
   }
 
-  function stopstream(address sender) external onlyOps {
-    // require(
-    //   ((block.timestamp - lastExecuted) > 180),
-    //   "Counter: increaseCount: Time not elapsed"
-    // );
+  function stopstream(address receiver) external onlyOps {
+
+    //// check if 
+
+
+    //// every task will be payed with a transfer, therefore receive(), we have to fund the contract
     uint256 fee;
     address feeToken;
 
@@ -98,8 +100,8 @@ contract GelatoSuperApp is SuperAppBase, OpsReady {
                abi.encodeWithSelector(
                 cfa.deleteFlow.selector,
                 superToken,
-                sender,
                 address(this),
+                receiver,
                 new bytes(0) // placeholder
             ),
                 "0x"

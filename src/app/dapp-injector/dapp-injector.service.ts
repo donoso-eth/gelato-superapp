@@ -13,7 +13,7 @@ import { Web3Actions, web3Selectors } from './store';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { Web3ModalComponent } from './web3-modal/web3-modal.component';
 import { Subject, takeUntil } from 'rxjs';
-import { MinimalContract} from 'src/assets/contracts/interfaces/MinimalContract';
+import {GelatoSuperApp } from 'src/assets/contracts/interfaces/GelatoSuperApp';
 import { AngularContract } from './classes';
 
 
@@ -25,7 +25,7 @@ export class DappInjector implements OnDestroy {
   private destroyHooks: Subject<void> = new Subject();
 
   ///// ---------  DAPP STATE INITIALIZATION
-  DAPP_STATE:IDAPP_STATE<MinimalContract> = {
+  DAPP_STATE:IDAPP_STATE<GelatoSuperApp> = {
    
     defaultProvider: null,
     connectedNetwork: null,
@@ -191,7 +191,7 @@ async localWallet(index:number) {
   ///// ---------  Contract Initialization
   private async contractInitialization() {
 
-    const contract = new AngularContract<MinimalContract>({
+    const contract = new AngularContract<GelatoSuperApp>({
       metadata: this.contractMetadata,
       provider: this.DAPP_STATE.defaultProvider!,
       signer: this.DAPP_STATE.signer!,
