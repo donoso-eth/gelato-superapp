@@ -7,3 +7,14 @@
 @import "assets/sass/layout/_variables";
 @import "assets/sass/layout/_layout";
 @import "assets/sass/overrides/_overrides";
+
+
+.p-link.router-link-active {
+    color:var(--primary-color);
+    
+}
+
+.p-link {
+   
+    color:var(--focus-ring);
+}

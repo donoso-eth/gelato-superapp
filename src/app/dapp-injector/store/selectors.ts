@@ -51,7 +51,7 @@ const hookContractConnected = pipe(
 
 const hookForceDisconnect = pipe(
   select(chainStatus),
-  filter((val) => val == 'disconnected')
+  filter((val) => val == 'force-disconnect')
 );
 
 

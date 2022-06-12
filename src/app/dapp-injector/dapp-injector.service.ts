@@ -46,7 +46,7 @@ export class DappInjector implements OnDestroy {
 
 
   constructor(
-    @Inject(DappConfigService) private dappConfig: IDAPP_CONFIG,
+    @Inject(DappConfigService) public dappConfig: IDAPP_CONFIG,
     @Inject(DOCUMENT) private readonly document: any,
     @Inject('contractMetadata') public contractMetadata: ICONTRACT_METADATA,
     private store: Store

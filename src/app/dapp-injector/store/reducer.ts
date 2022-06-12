@@ -25,10 +25,7 @@ const web3dReducer = createReducer(
   on(web3Actions.Web3Actions.chainStatus, (state,{status}) => ({ ...state,chainStatus:status})),
   on(web3Actions.Web3Actions.chainBusy, (state,{status}) => ({ ...state, isNetworkBusy:status})),
 
-
-
-  on(web3Actions.Web3Actions.readContractReady, (state,{readCotractisReady}) => ({ ...state, readingContract:readCotractisReady})),
-
+  on(web3Actions.Web3Actions.disconnectChain, (state) => ({ ...state,chainStatus:'force-disconnect'})),
 
   on(web3Actions.Web3Actions.setSignerNetwork, (state,{network}) => ({ ...state, signerNetwork:network})),
 
