@@ -30,7 +30,7 @@ if (existsSync('./typechain-types')) {
 const mainnetGwei = 21;
 
 
-const defaultNetwork = 'mumbai';
+const defaultNetwork = 'localhost';
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -45,12 +45,12 @@ const config: HardhatUserConfig = {
   defaultNetwork,
 
   networks: {
-    // hardhat: {
-    //   forking: {
-    //     url: `https://polygon-mumbai.g.alchemy.com/v2/${ALCHEMY_ID_MUMBAI}`,
-    //     blockNumber: 25953748,
-    //   },
-    // },
+    hardhat: {
+      forking: {
+        url: `https://polygon-mumbai.g.alchemy.com/v2/P2lEQkjFdNjdN0M_mpZKB8r3fAa2M0vT`,
+        blockNumber: 25953748,
+      },
+    },
     localhost: {
       url: 'http://localhost:8545',
       chainId: 31337,

@@ -9,7 +9,7 @@ export interface IDAPP_CONFIG {
   wallet: 'wallet' | 'privKey' | 'local',
 }
 
-export interface IDAPP_STATE<T extends Contract> {
+export interface IDAPP_STATE<T extends Contract, W extends Contract> {
   
   defaultProvider:providers.JsonRpcProvider | null;
   connectedNetwork:string | null
@@ -17,7 +17,8 @@ export interface IDAPP_STATE<T extends Contract> {
   signer: Signer | null,
   signerAddress:string | null,
 
-  defaultContract: AngularContract<T>| null,
+  gelatoAppContract: AngularContract<T>| null,
+  gelatoSuperAppContract: AngularContract<W>| null,
   viewContract :Contract | null,
 }
 

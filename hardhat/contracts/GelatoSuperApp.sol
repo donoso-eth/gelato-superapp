@@ -31,7 +31,7 @@ contract GelatoSuperApp is SuperAppBase, OpsReady {
     ISuperToken _superToken,
     address payable _ops,
     address _treasury
-  ) OpsReady(_ops, _treasury) {
+  ) OpsReady(_ops, payable(_treasury)) {
     host = _host;
 
     superToken = _superToken;

@@ -6,6 +6,8 @@ import { HomeComponent } from './home.component';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 
+import { InputNumberModule } from 'primeng/inputnumber';
+import { ClipboardModule } from '@angular/cdk/clipboard';
 @NgModule({
   declarations: [
     HomeComponent
@@ -14,7 +16,10 @@ import { DividerModule } from 'primeng/divider';
     CommonModule,
     HomeRoutingModule,
     ButtonModule,
-    DividerModule
+    DividerModule,
+    InputNumberModule,
+    ClipboardModule
+
   ]
 })
 export class HomeModule { }

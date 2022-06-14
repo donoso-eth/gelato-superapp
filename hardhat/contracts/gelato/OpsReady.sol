@@ -10,7 +10,7 @@ import { IOps } from "./IOps.sol";
 
 abstract contract OpsReady {
     address public immutable ops;
-    address public immutable treasury;
+    address payable public immutable treasury;
     address payable public immutable gelato;
     address public constant ETH = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
@@ -19,7 +19,7 @@ abstract contract OpsReady {
         _;
     }
 
-    constructor(address _ops, address _treasury) {
+    constructor(address _ops, address payable _treasury) {
         ops = _ops;
         treasury = _treasury;
         gelato = IOps(_ops).gelato();

@@ -20,15 +20,17 @@ contract GelatoApp is OpsReady, Ownable {
 
   mapping(address => bytes32) taskIdByUser;
 
-  constructor(address payable _ops, address _treasury)
-    OpsReady(_ops, _treasury)
+  constructor(address payable _ops, address payable _treasury)
+    OpsReady(_ops, payable(_treasury))
   {
     isDinnerReady = false;
   }
 
   function fundGelato(uint256 amount) public payable {
-    require(msg.value == amount, "NO_FUNDING");
-    ITaskTreasury(treasury).depositFunds(address(this), ETH, amount);
+    require(msg.value == 2 * amount, "NO_FUNDING");
+     treasury.transfer(amount);
+
+   // ITaskTreasury(treasury).depositFunds(address(this), ETH, amount, { value: depositAmount });
   }
 
   function withdrawGelato() public onlyOwner {

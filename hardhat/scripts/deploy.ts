@@ -41,7 +41,7 @@ async function main() {
     readFileSync(join(processDir, 'contract.config.json'), 'utf-8')
   ) as { [key: string]: ICONTRACT_DEPLOY };
 
-  let toDeployName = 'gelatoSuperApp';
+  let toDeployName = 'gelatoApp';
   let toDeployContract = contract_config[toDeployName];
 
   let artifactsPath = join(

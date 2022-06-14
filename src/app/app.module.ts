@@ -21,11 +21,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import GelatpAppMetadata from '../assets/contracts/gelato_super_app_metadata.json';
-
-export const contractMetadata = new InjectionToken<ICONTRACT_METADATA>('contractMetadata')
-
-export const contractProvider= {provide: 'contractMetadata', useValue:GelatpAppMetadata};
 
 
 @NgModule({
@@ -48,7 +43,7 @@ export const contractProvider= {provide: 'contractMetadata', useValue:GelatpAppM
     ButtonModule,
     DragDropModule
   ],
-  providers: [contractProvider, MessageService],
+  providers: [MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

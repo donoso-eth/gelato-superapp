@@ -15,6 +15,11 @@ import { Web3ModalComponent } from './web3-modal/web3-modal.component';
 import { Subject, takeUntil } from 'rxjs';
 import {GelatoSuperApp } from 'src/assets/contracts/interfaces/GelatoSuperApp';
 import { AngularContract } from './classes';
+import { GelatoApp } from '../../assets/contracts/interfaces/GelatoApp';
+
+import GelatoSuperAppMetadata from  '../../assets/contracts/gelato_super_app_metadata.json';
+import GelatoAppMetadata from '../../assets/contracts/gelato_app_metadata.json';
+
 
 
 @Injectable({
@@ -25,7 +30,7 @@ export class DappInjector implements OnDestroy {
   private destroyHooks: Subject<void> = new Subject();
 
   ///// ---------  DAPP STATE INITIALIZATION
-  DAPP_STATE:IDAPP_STATE<GelatoSuperApp> = {
+  DAPP_STATE:IDAPP_STATE<GelatoApp,GelatoSuperApp> = {
    
     defaultProvider: null,
     connectedNetwork: null,
@@ -33,7 +38,8 @@ export class DappInjector implements OnDestroy {
     signer:null,
     signerAddress:null,
 
-    defaultContract:  null,
+    gelatoAppContract:null,
+    gelatoSuperAppContract:null,
     viewContract:null,
 
   }
@@ -48,7 +54,6 @@ export class DappInjector implements OnDestroy {
   constructor(
     @Inject(DappConfigService) public dappConfig: IDAPP_CONFIG,
     @Inject(DOCUMENT) private readonly document: any,
-    @Inject('contractMetadata') public contractMetadata: ICONTRACT_METADATA,
     private store: Store
   ) {
     ///// ---------  Blockchain Bootstrap
@@ -191,17 +196,31 @@ async localWallet(index:number) {
   ///// ---------  Contract Initialization
   private async contractInitialization() {
 
-    const contract = new AngularContract<GelatoSuperApp>({
-      metadata: this.contractMetadata,
+    const gelatoAppContract = new AngularContract<GelatoApp>({
+      metadata: GelatoAppMetadata,
       provider: this.DAPP_STATE.defaultProvider!,
       signer: this.DAPP_STATE.signer!,
     });
 
-    await contract.init()
+    await gelatoAppContract.init()
 
-    this.DAPP_STATE.defaultContract = contract;
+    this.DAPP_STATE.gelatoAppContract = gelatoAppContract;
 
-    const b = this.DAPP_STATE.defaultContract;
+  
+
+    const gelatoSuperAppContract = new AngularContract<GelatoSuperApp>({
+      metadata: GelatoSuperAppMetadata ,
+      provider: this.DAPP_STATE.defaultProvider!,
+      signer: this.DAPP_STATE.signer!,
+    });
+
+    await gelatoSuperAppContract.init()
+
+    this.DAPP_STATE.gelatoSuperAppContract = gelatoSuperAppContract;
+
+
+
+
     const providerNetwork = await this.DAPP_STATE.defaultProvider!.getNetwork();
 
     const networkString = netWorkById(providerNetwork.chainId)?.name as string;
@@ -251,7 +270,8 @@ async localWallet(index:number) {
        this.store.dispatch(Web3Actions.chainBusy({ status: false }));
        this.DAPP_STATE.signer = null;
        this.DAPP_STATE.signerAddress = null;
-       this.DAPP_STATE.defaultContract = null;
+       this.DAPP_STATE.gelatoAppContract = null;
+       this.DAPP_STATE.gelatoSuperAppContract = null;
        this.DAPP_STATE.defaultProvider = null;
      });
 
@@ -276,12 +296,12 @@ async localWallet(index:number) {
     return this.DAPP_STATE.connectedNetwork
   }
 
-  get defaultContract() {
-    return this.DAPP_STATE.defaultContract
+  get gelatoAppContract() {
+    return this.DAPP_STATE.gelatoAppContract
   }
 
-  get defaultContractInstance() {
-    return this.DAPP_STATE.defaultContract?.instance
+  get gelatoSuperAppContract() {
+    return this.DAPP_STATE.gelatoSuperAppContract
   }
  
   async createProvider(url_array: string[]) {
