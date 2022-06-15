@@ -66,5 +66,12 @@ export class AppTopBarComponent extends DappBaseComponent {
 
     
   }
+
+
+  override async hookRefreshBalances(): Promise<void> {
+        console.log('refreshing balances')
+        let balance = await this.dapp.provider?.getBalance(this.dapp.signerAddress!);
+        console.log(balance)
+  }
   
 }

@@ -61,5 +61,13 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
 
   }
 
+
+
+
+  override async hookRefreshBalances(): Promise<void> {
+    
+      
+  }
+
   ngOnInit(): void {}
 }

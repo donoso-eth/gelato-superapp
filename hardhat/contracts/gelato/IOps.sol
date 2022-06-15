@@ -1,7 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+    struct Time {
+        uint128 nextExec;
+        uint128 interval;
+    }
+
 interface IOps {
+
+    function timedTask(bytes32 taskId) external view returns (Time memory time);
 
      function gelato() external view returns (address payable);
      
@@ -66,4 +73,43 @@ interface IOps {
         external
         view
         returns (bytes32[] memory);
+
+
+
+    /// @notice Execution API called by Gelato
+    /// @param _txFee Fee paid to Gelato for execution, deducted on the TaskTreasury
+    /// @param _feeToken Token used to pay for the execution. ETH = 0xeeeeee...
+    /// @param _taskCreator On which contract should Gelato check when to execute the tx
+    /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx
+    /// @param _revertOnFailure To revert or not if call to execAddress fails
+    /// @param _execAddress On which contract should Gelato execute the tx
+    /// @param _execData Data used to execute the tx, queried from the Resolver by Gelato
+    // solhint-disable function-max-lines
+    // solhint-disable code-complexity
+    function exec(
+        uint256 _txFee,
+        address _feeToken,
+        address _taskCreator,
+        bool _useTaskTreasuryFunds,
+        bool _revertOnFailure,
+        bytes32 _resolverHash,
+        address _execAddress,
+        bytes calldata _execData
+    ) external;
+
+        /// @notice Returns TaskId of a task Creator
+    /// @param _taskCreator Address of the task creator
+    /// @param _execAddress Address of the contract to be executed by Gelato
+    /// @param _selector Function on the _execAddress which should be executed
+    /// @param _useTaskTreasuryFunds If msg.sender's balance on TaskTreasury should pay for the tx
+    /// @param _feeToken FeeToken to use, address 0 if task treasury is used
+    /// @param _resolverHash hash of resolver address and data
+    function getTaskId(
+        address _taskCreator,
+        address _execAddress,
+        bytes4 _selector,
+        bool _useTaskTreasuryFunds,
+        address _feeToken,
+        bytes32 _resolverHash
+    ) external pure returns (bytes32);
 }
