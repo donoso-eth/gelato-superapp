@@ -33,18 +33,20 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
 
   async getTreasuryBalance() {
 
-    this.treasurybalance = await this.taskTreasuryContract.userTokenBalance(this.contractaddress,"ETH");
-    console.log(this.treasurybalance)
+    this.treasurybalance = await this.taskTreasuryContract.userTokenBalance(this.contractaddress,"0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE");
+    console.log(this.treasurybalance.toString())
   }
+
+  async widthDrawTreasury(){}
 
   async treasuryDeposit() {
     let value = utils.parseEther("0.1");
     let valueDouble = utils.parseEther("0.2");
     await doSignerTransaction(
-     // this.dapp.gelatoAppContract?.instance.fundGelato(value,{value:valueDouble})!
-
-      this.taskTreasuryContract.depositFunds(this.contractaddress, '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',  value,{ value})
+     this.dapp.gelatoAppContract?.instance.fundGelato(value,{value:value})!
     );
+
+  await this.getTreasuryBalance()
   }
 
   override async hookContractConnected(): Promise<void> {

@@ -27,10 +27,8 @@ contract GelatoApp is OpsReady, Ownable {
   }
 
   function fundGelato(uint256 amount) public payable {
-    require(msg.value == 2 * amount, "NO_FUNDING");
-     treasury.transfer(amount);
-
-   // ITaskTreasury(treasury).depositFunds(address(this), ETH, amount, { value: depositAmount });
+    require(msg.value == amount, "NO_FUNDING");
+    ITaskTreasury(treasury).depositFunds{value:amount}(address(this), ETH, amount);
   }
 
   function withdrawGelato() public onlyOwner {

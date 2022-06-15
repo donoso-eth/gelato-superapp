@@ -116,7 +116,7 @@ async function main() {
   );
 
   ///// create the local accounts file
-  console.log(`${contract_path}/local_accouts.json`);
+
   if (
     !existsSync(join(contract_path,'local_accouts.json')) &&
     (network == 'localhost' || network == 'hardhat')
