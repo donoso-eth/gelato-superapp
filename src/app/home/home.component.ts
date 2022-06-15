@@ -6,6 +6,7 @@ import { ITaskTreasury } from '../../assets/contracts/interfaces/ITaskTreasury';
 import { Contract, utils } from 'ethers';
 import { ITaskTreasury__factory } from 'src/assets/contracts/interfaces/ITaskTreasury__factory';
 import { doSignerTransaction } from '../dapp-injector/classes/transactor';
+import { displayAdress } from '../shared/helpers/helpers';
 
 @Component({
   selector: 'app-home',
@@ -23,13 +24,7 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
     super(dapp, store);
   }
 
-  displayAdress(address: string): string {
-    return (
-      address.slice(0, 5) +
-      '...' +
-      address.slice(address.length - 5, address.length)
-    );
-  }
+  displayAdress =  displayAdress;
 
   async getTreasuryBalance() {
 

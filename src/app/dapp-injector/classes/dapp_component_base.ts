@@ -38,6 +38,7 @@ export class DappBaseComponent implements OnDestroy, AfterViewInit {
 
   async hookForceDisconnect() {}
 
+  async hookRefreshBalances() {}
 
   ngAfterViewInit(): void {
     //////////   CHAIN STATUS //////////////////
@@ -90,8 +91,18 @@ export class DappBaseComponent implements OnDestroy, AfterViewInit {
       .pipe(web3Selectors.hookForceDisconnect)
       .pipe(takeUntil(this.destroyHooks))
       .subscribe(() => {
-        this.hookForceDisconnect;
+        this.hookForceDisconnect();
       });
+
+      this.store
+      .pipe(web3Selectors.hookRefreshBalances)
+      .pipe(takeUntil(this.destroyHooks))
+      .subscribe(() => {
+        this.hookRefreshBalances();
+      });
+
+
+      
 
     //////////  APP IS BUSY   ///////////////////
     this.store

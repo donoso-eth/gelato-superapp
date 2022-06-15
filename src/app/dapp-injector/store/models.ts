@@ -8,6 +8,7 @@ export interface Web3State {
     walletBalance:number;
     etherToDollar:number;
 
+    refreshBalance:boolean;
     
   }
 

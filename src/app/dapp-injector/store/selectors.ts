@@ -62,6 +62,11 @@ const hookReadContractConnected= pipe(
 );
 
 
+const hookRefreshBalances = pipe(
+  select(selectState),
+  map(map=> map.refreshBalance)
+);
+
 
 
 const isNetworkBusy = createSelector(
@@ -98,6 +103,7 @@ export const web3Selectors = {
   hookContractConnected,
   hookReadContractConnected,
   hookForceDisconnect,
+  hookRefreshBalances,
 
   isNetworkBusy,
 

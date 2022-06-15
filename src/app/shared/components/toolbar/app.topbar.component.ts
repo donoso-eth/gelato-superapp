@@ -6,6 +6,7 @@ import { FormControl } from '@angular/forms';
 import { DappBaseComponent, DappInjector, Web3Actions, Web3State } from 'angular-web3';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
+import { displayAdress } from '../../helpers/helpers';
 
 @Component({
   selector: 'app-topbar',
@@ -26,6 +27,8 @@ export class AppTopBarComponent extends DappBaseComponent {
      // this.router.navigateByUrl('landing');
     });
   }
+
+  displayAdress =  displayAdress;
 
   toggleMenu(val: any) {}
 
