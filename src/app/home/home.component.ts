@@ -36,8 +36,11 @@ export class HomeComponent extends DappBaseComponent implements OnInit {
     this.treasurybalance = await this.taskTreasuryContract.userTokenBalance(this.contractaddress,"0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE");
     console.log(this.treasurybalance.toString())
   }
-
-  async widthDrawTreasury(){}
+  async widthDrawTreasury(){
+    await doSignerTransaction(
+      this.dapp.gelatoAppContract?.instance.withdrawGelato()!
+     );
+  }
 
   async treasuryDeposit() {
     let value = utils.parseEther("0.1");

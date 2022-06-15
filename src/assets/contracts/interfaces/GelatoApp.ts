@@ -21,23 +21,45 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface GelatoAppInterface extends utils.Interface {
   functions: {
     "ETH()": FunctionFragment;
+    "cancelTask(bytes32)": FunctionFragment;
     "checker()": FunctionFragment;
+    "checkerCancel()": FunctionFragment;
     "createTask()": FunctionFragment;
+    "createTaskAndCancel()": FunctionFragment;
+    "createTaskNoPrePayment()": FunctionFragment;
     "fundGelato(uint256)": FunctionFragment;
     "gelato()": FunctionFragment;
+    "headacheFinish()": FunctionFragment;
     "ops()": FunctionFragment;
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "setPartyTime()": FunctionFragment;
+    "startParty()": FunctionFragment;
+    "startPartyandCancel()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "treasury()": FunctionFragment;
     "withdrawGelato()": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "ETH", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "cancelTask",
+    values: [BytesLike]
+  ): string;
   encodeFunctionData(functionFragment: "checker", values?: undefined): string;
   encodeFunctionData(
+    functionFragment: "checkerCancel",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "createTask",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "createTaskAndCancel",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "createTaskNoPrePayment",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -45,6 +67,10 @@ export interface GelatoAppInterface extends utils.Interface {
     values: [BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "gelato", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "headacheFinish",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "ops", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
@@ -52,7 +78,11 @@ export interface GelatoAppInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setPartyTime",
+    functionFragment: "startParty",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "startPartyandCancel",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -66,18 +96,36 @@ export interface GelatoAppInterface extends utils.Interface {
   ): string;
 
   decodeFunctionResult(functionFragment: "ETH", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "cancelTask", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "checker", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "checkerCancel",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "createTask", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "createTaskAndCancel",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "createTaskNoPrePayment",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "fundGelato", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "gelato", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "headacheFinish",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "ops", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "startParty", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "setPartyTime",
+    functionFragment: "startPartyandCancel",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -134,11 +182,32 @@ export interface GelatoApp extends BaseContract {
   functions: {
     ETH(overrides?: CallOverrides): Promise<[string]>;
 
+    "cancelTask(bytes32)"(
+      _taskId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    "cancelTask()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     checker(
       overrides?: CallOverrides
     ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
 
+    checkerCancel(
+      overrides?: CallOverrides
+    ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
+
     createTask(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    createTaskAndCancel(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    createTaskNoPrePayment(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -149,6 +218,10 @@ export interface GelatoApp extends BaseContract {
 
     gelato(overrides?: CallOverrides): Promise<[string]>;
 
+    headacheFinish(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     ops(overrides?: CallOverrides): Promise<[string]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
@@ -157,7 +230,11 @@ export interface GelatoApp extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setPartyTime(
+    startParty(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    startPartyandCancel(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -175,11 +252,32 @@ export interface GelatoApp extends BaseContract {
 
   ETH(overrides?: CallOverrides): Promise<string>;
 
+  "cancelTask(bytes32)"(
+    _taskId: BytesLike,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  "cancelTask()"(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   checker(
     overrides?: CallOverrides
   ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
 
+  checkerCancel(
+    overrides?: CallOverrides
+  ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
+
   createTask(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  createTaskAndCancel(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  createTaskNoPrePayment(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -190,6 +288,10 @@ export interface GelatoApp extends BaseContract {
 
   gelato(overrides?: CallOverrides): Promise<string>;
 
+  headacheFinish(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   ops(overrides?: CallOverrides): Promise<string>;
 
   owner(overrides?: CallOverrides): Promise<string>;
@@ -198,7 +300,11 @@ export interface GelatoApp extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setPartyTime(
+  startParty(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  startPartyandCancel(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -216,15 +322,32 @@ export interface GelatoApp extends BaseContract {
   callStatic: {
     ETH(overrides?: CallOverrides): Promise<string>;
 
+    "cancelTask(bytes32)"(
+      _taskId: BytesLike,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    "cancelTask()"(overrides?: CallOverrides): Promise<void>;
+
     checker(
+      overrides?: CallOverrides
+    ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
+
+    checkerCancel(
       overrides?: CallOverrides
     ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
 
     createTask(overrides?: CallOverrides): Promise<void>;
 
+    createTaskAndCancel(overrides?: CallOverrides): Promise<void>;
+
+    createTaskNoPrePayment(overrides?: CallOverrides): Promise<void>;
+
     fundGelato(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
     gelato(overrides?: CallOverrides): Promise<string>;
+
+    headacheFinish(overrides?: CallOverrides): Promise<void>;
 
     ops(overrides?: CallOverrides): Promise<string>;
 
@@ -232,7 +355,9 @@ export interface GelatoApp extends BaseContract {
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
-    setPartyTime(overrides?: CallOverrides): Promise<void>;
+    startParty(overrides?: CallOverrides): Promise<void>;
+
+    startPartyandCancel(overrides?: CallOverrides): Promise<void>;
 
     transferOwnership(
       newOwner: string,
@@ -258,9 +383,28 @@ export interface GelatoApp extends BaseContract {
   estimateGas: {
     ETH(overrides?: CallOverrides): Promise<BigNumber>;
 
+    "cancelTask(bytes32)"(
+      _taskId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    "cancelTask()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     checker(overrides?: CallOverrides): Promise<BigNumber>;
 
+    checkerCancel(overrides?: CallOverrides): Promise<BigNumber>;
+
     createTask(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    createTaskAndCancel(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    createTaskNoPrePayment(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -271,6 +415,10 @@ export interface GelatoApp extends BaseContract {
 
     gelato(overrides?: CallOverrides): Promise<BigNumber>;
 
+    headacheFinish(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     ops(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
@@ -279,7 +427,11 @@ export interface GelatoApp extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setPartyTime(
+    startParty(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    startPartyandCancel(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -298,9 +450,28 @@ export interface GelatoApp extends BaseContract {
   populateTransaction: {
     ETH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    "cancelTask(bytes32)"(
+      _taskId: BytesLike,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    "cancelTask()"(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     checker(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    checkerCancel(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     createTask(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    createTaskAndCancel(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    createTaskNoPrePayment(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -311,6 +482,10 @@ export interface GelatoApp extends BaseContract {
 
     gelato(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    headacheFinish(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     ops(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -319,7 +494,11 @@ export interface GelatoApp extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setPartyTime(
+    startParty(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    startPartyandCancel(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

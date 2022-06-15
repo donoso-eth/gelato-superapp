@@ -4,37 +4,56 @@
             <h5 class="text-center">Gelato App</h5>
             <div class="grid">
                 <div class="col-5 flex align-items-center flex-column justify-content-start">
-                 <div> 
-                    <h5 class="text-center">Using Gelato Treasury <br>
-                     <span *ngIf="!!contractaddress" style="font-size: smaller;"
-                     >{{displayAdress(contractaddress)}} </span> <i  class="pi pi-copy" style="font-size: 1rem"  [cdkCopyToClipboard]="contractaddress "></i>
-                    </h5>
-             
-                 </div> 
+                    <div>
+                        <h5 class="text-center">Using Gelato Treasury <br>
+                            <span *ngIf="!!contractaddress"
+                                style="font-size: smaller;">{{displayAdress(contractaddress)}} </span> <i
+                                class="pi pi-copy" style="font-size: 1rem" [cdkCopyToClipboard]="contractaddress "></i>
+                        </h5>
+
+                    </div>
                     <div class="grid p-fluid">
                         <div class="col-8">
-                            <p-inputNumber mode="decimal"  placeholder="Fund Treasury" [min]="0" [max]="100">
+                            <p-inputNumber mode="decimal" placeholder="Fund Treasury" [min]="0" [max]="100">
                             </p-inputNumber>
-                                      
-                        </div>
-                            <div class="col-4">
-                                <p-button label="Fund" class="mt-2"></p-button>
-                            </div>
-                  
-                            <div class="col-12">
-                                <button pButton pRipple type="button" label="withdraw" class="p-button-raised p-button-warning mr-2 mb-2"></button>
-                                          
-                            </div>
 
-                            <p-divider class="col-12" layout="horizontal">
-                           
-                            </p-divider>   
-                            
-                            <div class="col-12">
-                                <p-button label="Start Task" class="mt-2"></p-button>
-                                          
-                            </div>
-                       
+                        </div>
+                        <div class="col-4">
+                            <p-button label="Fund" class="mt-2"></p-button>
+                        </div>
+
+                        <div class="col-12">
+                            <button pButton pRipple type="button" label="withdraw"
+                                class="p-button-raised p-button-warning mr-2 mb-2"></button>
+
+                        </div>
+
+                        <p-divider class="col-12" layout="horizontal">
+
+                        </p-divider>
+
+                        <div class="col-12">
+                            <p-button label="Start Task" class="mt-2"></p-button>
+
+                        </div>
+
+                        <div class="col-12">
+                            <button pButton pRipple label="Cancel Task"
+                                class="p-button-raised p-button-danger mr-2 mb-2"></button>
+
+                        </div>
+
+                        <p-divider class="col-12" layout="horizontal">
+
+                        </p-divider>
+
+                        <div class="col-12">
+                            <button pButton pRipple label="Start Task and Cancel After First Execution"
+                                class="p-button-raised p-button-warning mr-2 mb-2"></button>
+
+                        </div>
+
+
                     </div>
                 </div>
                 <div class="col-2">
@@ -43,20 +62,44 @@
                     </p-divider>
                 </div>
                 <div class="col-5 align-items-center justify-content-center">
-                    <h5 class="text-center">Paying each transaction</h5>
-                    <p class="line-height-3 m-0">Sed ut perspiciatis unde omnis ist.</p>
+                    <h5 class="text-center">Paying Each Transaction</h5>
+
 
                     <p-divider layout="horizontal" align="center">
-                        <span class="p-tag">Badge</span>
+                        <span class="p-tag">Fund Gelato App Contract</span>
                     </p-divider>
 
-                    <p class="line-height-3 m-0">At vero eos et accu</p>
+                    <div class="grid p-fluid">
+                        <div class="col-8">
+                            <p-inputNumber mode="decimal" placeholder="Fund Gelato App" [min]="0" [max]="100">
+                            </p-inputNumber>
 
-                    <p-divider align="right">
-                        <p-button label="Button" icon="pi pi-search" styleClass="p-button-outlined"></p-button>
-                    </p-divider>
+                        </div>
+                        <div class="col-4">
+                            <p-button label="Fund" class="mt-2"></p-button>
+                        </div>
 
-                    <p class="line-height-3 m-0">Temporibus autem quibusdam et aut officiiodio.</p>
+                        <div class="col-12">
+                            <button pButton pRipple type="button" label="withdraw"
+                                class="p-button-raised p-button-warning mr-2 mb-2"></button>
+
+                        </div>
+                        <p-divider class="col-12" layout="horizontal">
+
+                        </p-divider>
+                        <div class="col-12">
+                            <p-button label="Start Task No PrePayment" class="mt-2"></p-button>
+
+                        </div>
+
+                        <div class="col-12">
+                            <button pButton pRipple label="Cancel Task"
+                                class="p-button-raised p-button-danger mr-2 mb-2"></button>
+
+                        </div>
+                    </div>
+
+
                 </div>
             </div>
         </div>
