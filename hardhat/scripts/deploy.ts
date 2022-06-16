@@ -11,7 +11,7 @@ import config from '../hardhat.config';
 import { join } from 'path';
 import { createHardhatAndFundPrivKeysFiles } from '../helpers/localAccounts';
 import * as hre from 'hardhat';
-import { GelatoApp__factory, GelatoSuperApp__factory } from '../typechain-types';
+import { PartyApp__factory, GelatoSuperApp__factory } from '../typechain-types';
 import { initEnv } from '../helpers/utils';
 
 let HOST = '0xEB796bdb90fFA0f28255275e16936D25d3418603';
@@ -43,7 +43,7 @@ async function main() {
     readFileSync(join(processDir, 'contract.config.json'), 'utf-8')
   ) as { [key: string]: ICONTRACT_DEPLOY };
 
-  let toDeployName = 'gelatoApp';
+  let toDeployName = 'partyApp';
   let toDeployContract = contract_config[toDeployName];
 
   let artifactsPath = join(
@@ -51,25 +51,27 @@ async function main() {
     `./artifacts/contracts/${toDeployContract.artifactsPath}`
   );
   let Metadata = JSON.parse(readFileSync(artifactsPath, 'utf-8'));
-  const gelatoApp = await new GelatoApp__factory(deployer).deploy(
+  const partyApp = await new PartyApp__factory(deployer).deploy(
 
     '0xB3f5503f93d5Ef84b06993a1975B9D21B962892F',
     '0x527a819db1eb0e34426297b03bae11F2f8B3A19E'
   );
+
+  
 
   writeFileSync(
     `${contract_path}/${toDeployContract.jsonName}_metadata.json`,
     JSON.stringify({
       abi: Metadata.abi,
       name: toDeployContract.name,
-      address: gelatoApp.address,
+      address: partyApp.address,
       network: network,
     })
   );
 
   console.log(
     toDeployContract.name + ' Contract Deployed to:',
-    gelatoApp.address
+    partyApp.address
   );
 
   ///// copy Interfaces and create Metadata address/abi to assets folder

@@ -3,7 +3,7 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { Store } from '@ngrx/store';
 import { Signer } from 'ethers';
 import { pipe, Subject, takeUntil } from 'rxjs';
-import { GelatoApp } from 'src/assets/contracts/interfaces/GelatoApp';
+import { PartyApp } from 'src/assets/contracts/interfaces/PartyApp';
 import { GelatoSuperApp } from 'src/assets/contracts/interfaces/GelatoSuperApp';
 import { DappInjector } from '../dapp-injector.service';
 import { NETWORK_STATUS, web3Selectors } from '../store';
@@ -17,7 +17,7 @@ export class DappBaseComponent implements OnDestroy, AfterViewInit {
   blockchain_is_busy: boolean = true;
   blockchain_status: NETWORK_STATUS = 'loading';
 
-  defaultContract!: AngularContract< GelatoApp >;
+  defaultContract!: AngularContract< PartyApp >;
 
   defaultProvider!: JsonRpcProvider;
 
@@ -71,7 +71,7 @@ export class DappBaseComponent implements OnDestroy, AfterViewInit {
       .pipe(web3Selectors.hookContractConnected)
       .pipe(takeUntil(this.destroyHooks))
       .subscribe(() => {
-        this.defaultContract = this.dapp.gelatoAppContract!;
+        this.defaultContract = this.dapp.partyAppContract!;
         this.signer = this.dapp.signer as Signer;
         this.defaultProvider = this.dapp.provider as JsonRpcProvider;
         this.signerAdress = this.dapp.signerAddress as string;
@@ -98,7 +98,7 @@ export class DappBaseComponent implements OnDestroy, AfterViewInit {
       .pipe(web3Selectors.hookRefreshBalances)
       .pipe(takeUntil(this.destroyHooks))
       .subscribe(() => {
-        this.hookRefreshBalances();
+       this.hookRefreshBalances();
       });
 
 

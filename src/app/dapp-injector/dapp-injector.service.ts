@@ -15,10 +15,10 @@ import { Web3ModalComponent } from './web3-modal/web3-modal.component';
 import { Subject, takeUntil } from 'rxjs';
 import {GelatoSuperApp } from 'src/assets/contracts/interfaces/GelatoSuperApp';
 import { AngularContract } from './classes';
-import { GelatoApp } from '../../assets/contracts/interfaces/GelatoApp';
+import { PartyApp } from '../../assets/contracts/interfaces/PartyApp';
 
 import GelatoSuperAppMetadata from  '../../assets/contracts/gelato_super_app_metadata.json';
-import GelatoAppMetadata from '../../assets/contracts/gelato_app_metadata.json';
+import PartyAppMetadata from '../../assets/contracts/party_app_metadata.json';
 
 
 
@@ -30,7 +30,7 @@ export class DappInjector implements OnDestroy {
   private destroyHooks: Subject<void> = new Subject();
 
   ///// ---------  DAPP STATE INITIALIZATION
-  DAPP_STATE:IDAPP_STATE<GelatoApp,GelatoSuperApp> = {
+  DAPP_STATE:IDAPP_STATE<PartyApp,GelatoSuperApp> = {
    
     defaultProvider: null,
     connectedNetwork: null,
@@ -38,7 +38,7 @@ export class DappInjector implements OnDestroy {
     signer:null,
     signerAddress:null,
 
-    gelatoAppContract:null,
+    partyAppContract:null,
     gelatoSuperAppContract:null,
     viewContract:null,
 
@@ -87,9 +87,10 @@ export class DappInjector implements OnDestroy {
       case 'wallet':
         const walletResult = await this.walletInitialization();
 
+        if (!!walletResult){
         this.DAPP_STATE.signer = walletResult.signer;
         this.DAPP_STATE.defaultProvider = walletResult.provider;
-
+        }
         this.webModalInstanceLaunch()
 
         break;
@@ -128,6 +129,7 @@ export class DappInjector implements OnDestroy {
 //// Local wallet initizlization
 async localWallet(index:number) {
 
+  
   console.log(index)
   this.store.dispatch(Web3Actions.chainBusy({ status: true }));
   this.store.dispatch(Web3Actions.chainStatus({status: 'loading'}))
@@ -150,7 +152,7 @@ async localWallet(index:number) {
     } catch (error) {
       this.store.dispatch(Web3Actions.chainStatus({ status: 'fail-to-connect-network' }));
       this.store.dispatch(Web3Actions.chainBusy({ status: false }));
-      throw new Error("FAIL_TO_CONNECT_NETWORK");
+  
       
     }
     return  hardhatProvider ;
@@ -181,7 +183,7 @@ async localWallet(index:number) {
       } else {
         this.store.dispatch(Web3Actions.chainStatus({ status: 'wallet-not-connected' }));
         this.store.dispatch(Web3Actions.chainBusy({ status: false }));
-        throw new Error("WALLET_NOT_CONNECTED");
+        return
         
       }
     } else {
@@ -189,22 +191,22 @@ async localWallet(index:number) {
       this.store.dispatch(Web3Actions.chainStatus({ status: 'wallet-not-connected' }));
 
       this.store.dispatch(Web3Actions.chainBusy({ status: false }));
-      throw new Error("WALLET_NOT_CONNECTED");
+      return
     }
   }
 
   ///// ---------  Contract Initialization
   private async contractInitialization() {
 
-    const gelatoAppContract = new AngularContract<GelatoApp>({
-      metadata: GelatoAppMetadata,
+    const partyAppContract = new AngularContract<PartyApp>({
+      metadata: PartyAppMetadata,
       provider: this.DAPP_STATE.defaultProvider!,
       signer: this.DAPP_STATE.signer!,
     });
 
-    await gelatoAppContract.init()
+    await partyAppContract.init()
 
-    this.DAPP_STATE.gelatoAppContract = gelatoAppContract;
+    this.DAPP_STATE.partyAppContract = partyAppContract;
 
   
 
@@ -270,7 +272,7 @@ async localWallet(index:number) {
        this.store.dispatch(Web3Actions.chainBusy({ status: false }));
        this.DAPP_STATE.signer = null;
        this.DAPP_STATE.signerAddress = null;
-       this.DAPP_STATE.gelatoAppContract = null;
+       this.DAPP_STATE.partyAppContract = null;
        this.DAPP_STATE.gelatoSuperAppContract = null;
        this.DAPP_STATE.defaultProvider = null;
      });
@@ -296,8 +298,8 @@ async localWallet(index:number) {
     return this.DAPP_STATE.connectedNetwork
   }
 
-  get gelatoAppContract() {
-    return this.DAPP_STATE.gelatoAppContract
+  get partyAppContract() {
+    return this.DAPP_STATE.partyAppContract
   }
 
   get gelatoSuperAppContract() {

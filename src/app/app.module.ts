@@ -20,6 +20,7 @@ import { AppTopBarComponent } from './shared/components/toolbar/app.topbar.compo
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ClipboardModule } from '@angular/cdk/clipboard';
 
 
 
@@ -41,7 +42,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     ProgressSpinnerModule,
     ToastModule,
     ButtonModule,
-    DragDropModule
+    DragDropModule,
+    ClipboardModule
   ],
   providers: [MessageService],
   bootstrap: [AppComponent]

@@ -17,7 +17,7 @@ export interface IDAPP_STATE<T extends Contract, W extends Contract> {
   signer: Signer | null,
   signerAddress:string | null,
 
-  gelatoAppContract: AngularContract<T>| null,
+  partyAppContract: AngularContract<T>| null,
   gelatoSuperAppContract: AngularContract<W>| null,
   viewContract :Contract | null,
 }

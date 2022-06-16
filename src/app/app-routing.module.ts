@@ -2,8 +2,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'home', loadChildren: () => import('./home/home.module').then(m => m.HomeModule) },
+  { path: '', redirectTo: 'party', pathMatch: 'full' },
+  { path: 'party', loadChildren: () => import('./party/party.module').then(m => m.PartyModule) },
   { path: 'super', loadChildren: () => import('./super-app/super-app.module').then(m => m.SuperAppModule) }];
 
 @NgModule({

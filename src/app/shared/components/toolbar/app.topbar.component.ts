@@ -7,6 +7,7 @@ import { DappBaseComponent, DappInjector, Web3Actions, Web3State } from 'angular
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { displayAdress } from '../../helpers/helpers';
+import { ethers, utils } from 'ethers';
 
 @Component({
   selector: 'app-topbar',
@@ -20,13 +21,16 @@ export class AppTopBarComponent extends DappBaseComponent {
   harhdat_local_privKeys: Array<{ key: string; address: string }> = [];
   network!: string;
   address_to_show!: string;
+  userbalance: ethers.BigNumber | undefined;
   constructor(private router: Router, dapp: DappInjector, store: Store<Web3State>) {
     super(dapp, store);
     this.localUserCtrl.valueChanges.pipe(takeUntil(this.destroyHooks)).subscribe((val) => {
-      this.dapp.localWallet(val);
+     // this.dapp.localWallet(val);
      // this.router.navigateByUrl('landing');
     });
   }
+
+  utils = utils;
 
   displayAdress =  displayAdress;
 
@@ -48,20 +52,22 @@ export class AppTopBarComponent extends DappBaseComponent {
   
     this.dapp.launchWebModal()
    
-    // this.router.navigate(['home'])
+    // this.router.navigate(['party'])
       
     }
 
   override async hookContractConnected(): Promise<void> {
-    this.address_to_show = await this.signer.getAddress();
+    
+    this.address_to_show = await this.dapp.signerAddress!;
 
     this.network = this.dapp.dappConfig.defaultNetwork!;
-    // console.log(this.network)
+    console.log(this.network)
      if (this.network == 'localhost') {
       this.harhdat_local_privKeys = (await import('../../../../assets/contracts/local_accouts.json')).default;
       const index = this.harhdat_local_privKeys.map((map) => map.address.toLowerCase()).indexOf(this.dapp.signerAddress!.toLowerCase());
 
       this.localUserCtrl.setValue(index + 1, { emitEvent: false });
+
     }
 
     
@@ -69,9 +75,10 @@ export class AppTopBarComponent extends DappBaseComponent {
 
 
   override async hookRefreshBalances(): Promise<void> {
-        console.log('refreshing balances')
-        let balance = await this.dapp.provider?.getBalance(this.dapp.signerAddress!);
-        console.log(balance)
+
+       this.userbalance = await this.dapp.provider?.getBalance(this.dapp.signerAddress!);
+        console.log(this.userbalance)
+      //  this.store.dispatch(Web3Actions.refreshBalances({refreshBalance:false}));
   }
   
 }

@@ -19,7 +19,14 @@ export const doSignerTransaction = async (
     notification_message.payload = tx_result;
     return notification_message;
   } catch (e: any) {
-    notification_message.payload = e;
+    // notification_message.payload = e;
+    // let em = JSON.stringify(e.message);
+    // let check = `"Error: VM Exception while processing transaction: reverted with reason string '`;
+    // let b = em.indexOf(check)
+    // let em2 =  em.substring(b + check.length,em.length);
+    // let c = em2.indexOf(`\"`)
+    // let err = em2.substring(0,c-2);
+    // console.log(err);
     let message =
       e.data && e.data.message
         ? e.data.message
@@ -27,7 +34,7 @@ export const doSignerTransaction = async (
         ? JSON.parse(JSON.parse(JSON.stringify(e.error)).body).error.message
         : e.data
         ? e.data
-        : JSON.stringify(e);
+        : JSON.stringify(e.message);
     if (!e.error && e.message) {
       message = e.message;
     }

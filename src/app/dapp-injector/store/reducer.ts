@@ -28,7 +28,7 @@ const web3dReducer = createReducer(
 
   on(web3Actions.Web3Actions.disconnectChain, (state) => ({ ...state,chainStatus:'force-disconnect'})),
 
-  on(web3Actions.Web3Actions.refreshBalances, (state) => ({ ...state,refreshBalance: !state.refreshBalance})),
+  on(web3Actions.Web3Actions.refreshBalances, (state,{refreshBalance}) => ({ ...state,refreshBalance:refreshBalance })),
 
   on(web3Actions.Web3Actions.setSignerNetwork, (state,{network}) => ({ ...state, signerNetwork:network})),
 

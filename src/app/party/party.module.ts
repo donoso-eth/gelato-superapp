@@ -1,20 +1,23 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-import { HomeRoutingModule } from './home-routing.module';
-import { HomeComponent } from './home.component';
+import { PartyRoutingModule } from './party-routing.module';
+import { PartyComponent } from './party.component';
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ClipboardModule } from '@angular/cdk/clipboard';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 @NgModule({
   declarations: [
-    HomeComponent
+    PartyComponent
   ],
   imports: [
     CommonModule,
-    HomeRoutingModule,
+    PartyRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
     ButtonModule,
     DividerModule,
     InputNumberModule,
@@ -22,4 +25,4 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
 
   ]
 })
-export class HomeModule { }
+export class PartyModule { }

@@ -2,7 +2,7 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { expect } from "chai";
 
-import { GelatoApp, GelatoApp__factory, IOps, IOps__factory, ITaskTreasury } from "../typechain-types";
+import { PartyApp, PartyApp__factory, IOps, IOps__factory, ITaskTreasury } from "../typechain-types";
 
 import * as hre from 'hardhat';
 
@@ -17,7 +17,7 @@ let GELATO_TREASURY = '0x527a819db1eb0e34426297b03bae11F2f8B3A19E';
 let ops: IOps;
 
 let taskTreasury: ITaskTreasury
-let gelatoApp:GelatoApp;
+let partyApp:PartyApp;
 let deployer: Signer;
 let deployerAddress: string;
 
@@ -43,7 +43,7 @@ describe("Ops createTimedTask test", function () {
     [deployer] = await ethers.getSigners();
     deployerAddress = await deployer.getAddress();
 
-   gelatoApp = await new GelatoApp__factory(deployer).deploy(GELATO_OPS, GELATO_TREASURY)
+   partyApp = await new PartyApp__factory(deployer).deploy(GELATO_OPS, GELATO_TREASURY)
 
 
 
@@ -56,7 +56,7 @@ describe("Ops createTimedTask test", function () {
     const depositAmount = ethers.utils.parseEther("1");
     await taskTreasury
       .connect(deployer)
-      .depositFunds(gelatoApp.address, ETH, depositAmount, { value: depositAmount });
+      .depositFunds(partyApp.address, ETH, depositAmount, { value: depositAmount });
 
     await hre.network.provider.request({
       method: "hardhat_impersonateAccount",
@@ -65,11 +65,11 @@ describe("Ops createTimedTask test", function () {
 
     executor = await ethers.provider.getSigner(executorAddress);
 
-    execData = await gelatoApp.interface.encodeFunctionData("startParty");
-    execAddress = gelatoApp.address;
+    execData = await partyApp.interface.encodeFunctionData("startParty");
+    execAddress = partyApp.address;
     execSelector = await  ethers.utils.defaultAbiCoder.encode(['string'],["startParty"]);
-    resolverAddress = gelatoApp.address;
-    resolverData = await gelatoApp.interface.encodeFunctionData("checker");
+    resolverAddress = partyApp.address;
+    resolverData = await partyApp.interface.encodeFunctionData("checker");
 
     resolverHash = ethers.utils.keccak256(
       new ethers.utils.AbiCoder().encode(
@@ -119,7 +119,7 @@ describe("Ops createTimedTask test", function () {
   });
 
   it("Exec should fail when time not elapsed", async () => {
-    const [canExec, payload] = await gelatoApp.checker();
+    const [canExec, payload] = await partyApp.checker();
 
     expect(payload).to.be.eql(execData);
     expect(canExec).to.be.eql(true);

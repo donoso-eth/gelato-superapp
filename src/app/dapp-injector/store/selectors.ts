@@ -21,6 +21,11 @@ const chainStatus = createSelector(
   (state: Web3State) => state.chainStatus
 );
 
+const refreshAction = createSelector(
+  selectWeb3State,
+  (state: Web3State) => state.refreshBalance
+);
+
 
 const hookChanIsLoading = pipe(
   select(chainStatus),
@@ -63,8 +68,8 @@ const hookReadContractConnected= pipe(
 
 
 const hookRefreshBalances = pipe(
-  select(selectState),
-  map(map=> map.refreshBalance)
+  select(refreshAction),
+  filter((val) => val == true)
 );
 
 

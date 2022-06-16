@@ -5,10 +5,10 @@
     "ctor": [],
     "jsonName": "gelato_super_app"
   },
-  "gelatoApp": {
-    "artifactsPath": "GelatoApp.sol/GelatoApp.json",
-    "name": "GelatoApp",
+  "partyApp": {
+    "artifactsPath": "PartyApp.sol/PartyApp.json",
+    "name": "PartyApp",
     "ctor": [],
-    "jsonName": "gelato_app"
+    "jsonName": "party_app"
   }
 }

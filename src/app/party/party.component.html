@@ -1,0 +1,188 @@
+<div class="grid">
+  <div class="col-12">
+    <div class="card">
+      <h5 class="text-center">
+        Gelato App  <i (click)="refresh()"
+        class="pi pi-refresh"
+        style="font-size: 1rem; cursor: pointer"
+      ></i><br />
+        <span *ngIf="!!contractaddress" style="font-size: smaller"
+          >{{ displayAdress(contractaddress) }}
+        </span>
+        <i
+          class="pi pi-copy"
+          style="font-size: 1rem; cursor: pointer"
+          [cdkCopyToClipboard]="contractaddress"
+        ></i>
+        <br />
+        <span *ngIf="!!partyAppBalance"
+          >{{ utils.formatEther(partyAppBalance!) }} ETH
+        </span>
+      </h5>
+      <div style="display: flex; align-items: center;justify-content: center;position: relative;top: -10px;">
+        <img *ngIf="headache == true" (click)="headacheFinish()"
+          style="margin-right:10px;width: 40px; filter: drop-shadow(2px 4px 6px black)"
+          src="assets/images/headache.png"
+        />
+        <img *ngIf="headache == false" style="width: 40px;margin-right:10px;" src="assets/images/no-headache.png" />
+        <span>Last Party: {{lastPartyStart}} </span>
+      </div>
+      <p-divider> </p-divider>
+      <div class="grid">
+        <div
+          class="col-5 flex align-items-center flex-column justify-content-start"
+        >
+          <div>
+            <h5 class="text-center">
+              Using Gelato Treasury <br />
+              <span *ngIf="!!contractaddress" style="font-size: smaller"
+                >{{ displayAdress(taskTreasury) }}
+              </span>
+              <i
+                class="pi pi-copy"
+                style="font-size: 1rem; cursor: pointer"
+                [cdkCopyToClipboard]="contractaddress"
+              ></i
+              ><br />
+              <span *ngIf="!!treasurybalance"
+                >{{ utils.formatEther(treasurybalance) }} ETH
+              </span>
+            </h5>
+          </div>
+          <div class="grid p-fluid">
+            <div class="col-8">
+              <p-inputNumber
+                [formControl]="treasuryCtrl"
+                mode="decimal"
+                placeholder="Fund Treasury"
+                [min]="0"
+                [step]="0.1"
+                [showButtons]="true"
+                [max]="100"
+              >
+              </p-inputNumber>
+            </div>
+            <div class="col-4">
+              <p-button
+                label="Fund"
+                (click)="treasuryDeposit()"
+                class="mt-2"
+              ></p-button>
+            </div>
+
+            <div class="col-12">
+              <button
+                (click)="widthDrawTreasury()"
+                pButton
+                pRipple
+                type="button"
+                label="withdraw"
+                class="p-button-raised p-button-warning mr-2 mb-2"
+              ></button>
+            </div>
+
+            <p-divider class="col-12" layout="horizontal"> </p-divider>
+
+            <div class="col-12">
+              <p-button
+                (click)="createTask()"
+                label="Start Task"
+                class="mt-2"
+              ></p-button>
+            </div>
+
+            <div class="col-12">
+              <button
+                pButton
+                pRipple
+                (click)="cancelTask()"
+                label="Cancel Task"
+                class="p-button-raised p-button-danger mr-2 mb-2"
+              ></button>
+            </div>
+
+            <p-divider class="col-12" layout="horizontal"> </p-divider>
+
+            <div class="col-12">
+              <button
+                (click)="createTaskAndCancel()"
+                pButton
+                pRipple
+                label="Start Task and Cancel After First Execution"
+                class="p-button-raised p-button-warning mr-2 mb-2"
+              ></button>
+            </div>
+          </div>
+        </div>
+        <div class="col-2">
+          <p-divider layout="vertical">
+            <b>OR</b>
+          </p-divider>
+        </div>
+        <div class="col-5 align-items-center justify-content-center">
+          <h5 class="text-center">Paying Each Transaction</h5>
+
+          <p-divider layout="horizontal" align="center">
+            <span class="p-tag">Fund Gelato App Contract</span>
+          </p-divider>
+
+          <div class="grid p-fluid">
+            <div class="col-8">
+              <p-inputNumber
+                [formControl]="contractCtrl"
+                mode="decimal"
+                placeholder="Fund Gelato App"
+                [min]="0"
+                [step]="0.1"
+                [showButtons]="true"
+                [max]="100"
+              >
+              </p-inputNumber>
+            </div>
+            <div class="col-4">
+              <p-button label="Fund" (click)="fundContract()" class="mt-2"></p-button>
+            </div>
+
+            <div class="col-12">
+              <button (click)="withdrawContract()" 
+                pButton
+                pRipple
+                type="button"
+                label="withdraw"
+                class="p-button-raised p-button-warning mr-2 mb-2"
+              ></button>
+            </div>
+            <p-divider class="col-12" layout="horizontal"> </p-divider>
+            <div class="col-12">
+              <p-inputNumber
+                [formControl]="msgValueCtrl"
+                mode="decimal"
+                placeholder="Send Value with Tx"
+                [min]="0"
+                [step]="0.1"
+                [showButtons]="true"
+                [max]="100"
+              >
+              </p-inputNumber>
+            </div>
+            <div class="col-12">
+              <p-button (click)="createTaskNoPrepayment()"
+                label="Start Task No PrePayment"
+                class="mt-2"
+              ></p-button>
+            </div>
+
+            <div class="col-12">
+              <button  (click)="cancelTask()"
+                pButton
+                pRipple
+                label="Cancel Task"
+                class="p-button-raised p-button-danger mr-2 mb-2"
+              ></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
