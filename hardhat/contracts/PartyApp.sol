@@ -45,7 +45,7 @@ contract PartyApp is OpsReady, Ownable {
    
     require(taskIdByUser[msg.sender] == bytes32(0), "TASK_STILL_ACTIVE");
    
-     require(msg.value > 0.1 ether || address(this).balance > 0.1 ether, "NO_FUNDING");
+     require(msg.value >= 0.1 ether || address(this).balance > 0.1 ether, "NO_FUNDING");
 
     bytes32 taskId = IOps(ops).createTaskNoPrepayment(
       address(this),
@@ -153,8 +153,7 @@ contract PartyApp is OpsReady, Ownable {
     returns (bool canExec, bytes memory execPayload)
   {
     canExec = headachePresent == false;
-    console.log(164);
-    console.log(user);
+
     execPayload = abi.encodeWithSelector(
       this.startPartyandCancel.selector,
       user
@@ -163,8 +162,7 @@ contract PartyApp is OpsReady, Ownable {
 
   function startPartyandCancel(address user) external onlyOps {
     require(headachePresent == false, "NOT_READY");
-    console.log(171);
-    console.log(user);
+
     // require(block.timestamp - lastPartyStart > 300, "NOT_YET_TIME");
     cancelTaskById(taskIdByUser[user]);
     lastPartyStart = block.timestamp;

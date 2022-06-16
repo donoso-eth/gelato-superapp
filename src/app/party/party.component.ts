@@ -62,8 +62,9 @@ export class PartyComponent extends DappBaseComponent implements OnInit {
 
 
   async createTaskNoPrepayment(){
+    console.log( this.msgValueCtrl.value)
     this.store.dispatch(Web3Actions.chainBusy({ status: true }));
-    if (this.msgValueCtrl.value == 0){
+    if (this.msgValueCtrl.value == 0 || this.msgValueCtrl.value == undefined){
     await doSignerTransaction(
       this.dapp.partyAppContract?.instance.createTaskNoPrepayment()!
     );
