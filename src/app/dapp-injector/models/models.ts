@@ -5,7 +5,7 @@ import { INETWORK, NETWORK_TYPE } from "../constants";
 
 
 export interface IDAPP_CONFIG {
-  defaultNetwork: string,
+  defaultNetwork: 'mumbai' | 'localhost',
   wallet: 'wallet' | 'privKey' | 'local',
 }
 

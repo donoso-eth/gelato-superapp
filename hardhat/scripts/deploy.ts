@@ -82,42 +82,42 @@ async function main() {
  
  
  
-//    toDeployName = 'gelatoSuperApp';
+   toDeployName = 'gelatoSuperApp';
 
-//    toDeployContract = contract_config[toDeployName];
+   toDeployContract = contract_config[toDeployName];
 
-//   artifactsPath = join(
-//     processDir,
-//     `./artifacts/contracts/${toDeployContract.artifactsPath}`
-//   );
-//  Metadata = JSON.parse(readFileSync(artifactsPath, 'utf-8'));
-//   const gelatoSuperApp = await new GelatoSuperApp__factory(deployer).deploy(
-//     '0xEB796bdb90fFA0f28255275e16936D25d3418603',
-//     '0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f',
-//     '0xB3f5503f93d5Ef84b06993a1975B9D21B962892F',
-//     '0x527a819db1eb0e34426297b03bae11F2f8B3A19E'
-//   );
+  artifactsPath = join(
+    processDir,
+    `./artifacts/contracts/${toDeployContract.artifactsPath}`
+  );
+ Metadata = JSON.parse(readFileSync(artifactsPath, 'utf-8'));
+  const gelatoSuperApp = await new GelatoSuperApp__factory(deployer).deploy(
+    '0xEB796bdb90fFA0f28255275e16936D25d3418603',
+    '0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f',
+    '0xB3f5503f93d5Ef84b06993a1975B9D21B962892F',
+    '0x527a819db1eb0e34426297b03bae11F2f8B3A19E'
+  );
 
-//   writeFileSync(
-//     `${contract_path}/${toDeployContract.jsonName}_metadata.json`,
-//     JSON.stringify({
-//       abi: Metadata.abi,
-//       name: toDeployContract.name,
-//       address: gelatoSuperApp.address,
-//       network: network,
-//     })
-//   );
+  writeFileSync(
+    `${contract_path}/${toDeployContract.jsonName}_metadata.json`,
+    JSON.stringify({
+      abi: Metadata.abi,
+      name: toDeployContract.name,
+      address: gelatoSuperApp.address,
+      network: network,
+    })
+  );
 
-//   console.log(
-//     toDeployContract.name + ' Contract Deployed to:',
-//     gelatoSuperApp.address
-//   );
+  console.log(
+    toDeployContract.name + ' Contract Deployed to:',
+    gelatoSuperApp.address
+  );
 
-//   ///// copy Interfaces and create Metadata address/abi to assets folder
-//   copySync(
-//     `./typechain-types/${toDeployContract.name}.ts`,
-//     join(contract_path, 'interfaces', `${toDeployContract.name}.ts`)
-//   );
+  ///// copy Interfaces and create Metadata address/abi to assets folder
+  copySync(
+    `./typechain-types/${toDeployContract.name}.ts`,
+    join(contract_path, 'interfaces', `${toDeployContract.name}.ts`)
+  );
 
   ///// create the local accounts file
 
