@@ -52,22 +52,22 @@ export class UserBalanceComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const source = interval(500);
 
-    this.balanceSubscription = source.subscribe(async (val) => {
-      const superToken = this.createSuperTokenInstance(
-        this.tokenObj.superToken,
-        this.dapp.signer!
-      );
+    // this.balanceSubscription = source.subscribe(async (val) => {
+    //   const superToken = this.createSuperTokenInstance(
+    //     this.tokenObj.superToken,
+    //     this.dapp.signer!
+    //   );
 
-      const startMs = (new Date().getTime() / 1000).toFixed(0);
-      const balanceSupertoken = await superToken.realtimeBalanceOf(
-        this.dapp.signerAddress,
-        startMs
-      );
+    //   const startMs = (new Date().getTime() / 1000).toFixed(0);
+    //   const balanceSupertoken = await superToken.realtimeBalanceOf(
+    //     this.dapp.signerAddress,
+    //     startMs
+    //   );
 
-      this.tokenObj.superTokenBalance = (+utils.formatEther(
-        balanceSupertoken[0]
-      )).toFixed(6);
-    });
+    //   this.tokenObj.superTokenBalance = (+utils.formatEther(
+    //     balanceSupertoken[0]
+    //   )).toFixed(6);
+    // });
     this.refreshBalance();
   }
 

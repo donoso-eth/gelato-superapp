@@ -126,13 +126,6 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable  {
   function stopstream(address sender, address receiver) external onlyOps {
     //// check if
 
-    //// every task will be payed with a transfer, therefore receive(), we have to fund the contract
-    uint256 fee;
-    address feeToken;
-
-    (fee, feeToken) = IOps(ops).getFeeDetails();
-
-    _transfer(fee, feeToken);
 
     /////// STOP IF EXISTS outcoming stream
     (, int96 outFlowRate, , ) = cfa.getFlow(superToken,address(this),receiver);
@@ -168,7 +161,7 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable  {
       );
     }
     bytes32 _taskId = taskIdByUser[sender];
-   cancelTaskbyId(_taskId);
+    cancelTaskbyId(_taskId);
 
   }
 
@@ -254,7 +247,7 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable  {
       ETH,
       true
     );
-      taskIdByUser[msg.sender] = taskId;
+      taskIdByUser[sender] = taskId;
     //registerGelato and set call back find stream
 
     return newCtx;

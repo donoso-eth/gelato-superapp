@@ -29,9 +29,12 @@ task('task-stream', 'Exucute Stream Task').setAction(async ({}, hre) => {
     const accounts = await hre.ethers.getSigners();
   
     const deployer = accounts[0];
-    console.log(deployer.address)
-
+    const receiver = accounts[1];
     const deployerAddress = deployer.address;
+    let receiverAddress = receiver.address;
+    console.log(deployerAddress, receiverAddress)
+
+  
     
   const deployContract="gelatoSuperApp"
   const toDeployContract = contract_config[deployContract];
@@ -74,7 +77,7 @@ const flow = sf.cfaV1;
  result = await flow.getFlow({
     superToken,
     sender: gelatoSuperApp.address,
-    receiver:"0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+    receiver:receiverAddress ,
     providerOrSigner: deployer
   });
  console.log(result);
@@ -93,12 +96,14 @@ const flow = sf.cfaV1;
   let executor = await hre.ethers.provider.getSigner(executorAddress);
 console.log(gelatoSuperApp.address)
 
+let gelatoSuperAppAdress = gelatoSuperApp.address;
+
 ////// EXECUTE CREATe TASK
-execData = await gelatoSuperApp.interface.encodeFunctionData("stopstream",[deployer.address,"0x70997970C51812dc3A010C7d01b50e0d17dc79C8"]);
-execAddress = gelatoSuperApp.address;
+execData = await gelatoSuperApp.interface.encodeFunctionData("stopstream",[deployerAddress,receiverAddress]);
+execAddress = gelatoSuperAppAdress;
 execSelector = await  ethers.utils.defaultAbiCoder.encode(['string'],["stopstream"]);
-resolverAddress = gelatoSuperApp.address;
-resolverData = await gelatoSuperApp.interface.encodeFunctionData("checker",[deployer.address,"0x70997970C51812dc3A010C7d01b50e0d17dc79C8"]);
+resolverAddress = gelatoSuperAppAdress ;
+resolverData = await gelatoSuperApp.interface.encodeFunctionData("checker",[deployerAddress,receiverAddress]);
 
 resolverHash = ethers.utils.keccak256(
   new ethers.utils.AbiCoder().encode(
@@ -107,17 +112,38 @@ resolverHash = ethers.utils.keccak256(
   )
 );
 
-let [canExec, payload] = await gelatoSuperApp.checker(deployerAddress,"0x70997970C51812dc3A010C7d01b50e0d17dc79C8");
+
+
+
+let [canExec, payload] = await gelatoSuperApp.checker(deployerAddress,receiverAddress);
 
   console.log(107,canExec);
 
   const ops = IOps__factory.connect(GELATO_OPS,executor)
 
-await waitForTx (ops
+  let tata = await ops.getTaskIdsByUser(gelatoSuperAppAdress)
+
+  console.log(tata);
+    return;
+  // let opsAddress = GELATO_OPS;
+
+  // await hre.network.provider.request({
+  //   method: "hardhat_impersonateAccount",
+  //   params: [opsAddress],
+  // });
+
+  // let opsImpersonate = await hre.ethers.provider.getSigner(opsAddress);
+
+  // const gelatoSuperAppexec = GelatoSuperApp__factory.connect(metadata.address, opsImpersonate)
+  // await gelatoSuperAppexec.stopstream(deployerAddress,receiverAddress)
+
+
+  //   return
+  await waitForTx (ops
       .exec(
         ethers.utils.parseEther("0.05"),
         ETH,
-        gelatoSuperApp.address,
+        gelatoSuperAppAdress,
         true, ///// We are  using the treasury
         true,
         resolverHash,

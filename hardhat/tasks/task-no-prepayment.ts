@@ -89,6 +89,6 @@ await waitForTx (ops
       ));
 
 
-  console.log(await partyApp.headachePresent())
+
   });
   
