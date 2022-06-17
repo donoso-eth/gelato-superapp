@@ -12,6 +12,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { DropdownModule } from 'primeng/dropdown';
 import { SuperFluidService } from './super-fluid-service.service';
 import { InputTextModule } from 'primeng/inputtext';
+import { UserBalanceModule } from '../shared/components/user-balance/user-balance.module';
 
 
 
@@ -30,6 +31,7 @@ import { InputTextModule } from 'primeng/inputtext';
     ClipboardModule,
     DropdownModule,
     InputTextModule,
+    UserBalanceModule
   ],
   providers:[SuperFluidService]
 })

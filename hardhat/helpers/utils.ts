@@ -107,3 +107,12 @@ export async function mineBlocks(hre:HardhatRuntimeEnvironment, nrOfBlocks:numbe
     });
   }
 }
+
+export async function setNextBlockTimestamp(hre: HardhatRuntimeEnvironment,timestamp: number): Promise<void> {
+  await hre.ethers.provider.send('evm_setNextBlockTimestamp', [timestamp]);
+}
+export async function getTimestamp(hre: HardhatRuntimeEnvironment): Promise<any> {
+  const blockNumber = await hre.ethers.provider.send('eth_blockNumber', []);
+  const block = await hre.ethers.provider.send('eth_getBlockByNumber', [blockNumber, false]);
+  return block.timestamp;
+}

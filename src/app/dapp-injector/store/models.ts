@@ -13,3 +13,5 @@ export interface Web3State {
   }
 
   export type NETWORK_STATUS = 'loading' | 'fail-to-connect-network' | 'wallet-not-connected' | 'wallet-connected' | 'disconnected' | 'force-disconnect';
+
+  

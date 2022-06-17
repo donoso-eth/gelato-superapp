@@ -9,27 +9,27 @@ import { doSignerTransaction } from '../dapp-injector/classes/transactor';
 import { DappInjector } from '../dapp-injector/dapp-injector.service';
 import { Web3Actions } from '../dapp-injector/store';
 import { displayAdress, isAddress } from '../shared/helpers/helpers';
-import { SuperFluidService} from './super-fluid-service.service';
+import { SuperFluidService } from './super-fluid-service.service';
 
 @Component({
   selector: 'app-super-app',
   templateUrl: './super-app.component.html',
-  styleUrls: ['./super-app.component.scss']
+  styleUrls: ['./super-app.component.scss'],
 })
 export class SuperAppComponent extends DappBaseComponent implements OnInit {
   contractaddress!: string;
 
   taskTreasury = '0x527a819db1eb0e34426297b03bae11F2f8B3A19E';
-  superToken="0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f"
+  superToken = '0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f';
 
   bonusGranted = true;
 
   taskTreasuryContract!: ITaskTreasury;
   treasurybalance: any;
   treasuryCtrl = new FormControl();
-  durationCtrl: FormControl = new FormControl(); 
+  durationCtrl: FormControl = new FormControl();
   receiveCtrl: FormControl = new FormControl();
-  startCtrl:FormControl = new FormControl();
+  startCtrl: FormControl = new FormControl();
   streamDuration = [
     // { name: 'minutes', id: 0, factor: 60 },
     { name: '5 min', id: 1, factor: 300 },
@@ -38,61 +38,76 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
   ];
   superAppBalance: any;
 
-  constructor(dapp: DappInjector, store: Store, public superfluidService:SuperFluidService) {
+  constructor(
+    dapp: DappInjector,
+    store: Store,
+    public superfluidService: SuperFluidService
+  ) {
     super(dapp, store);
-    this.durationCtrl = new FormControl([ { name: '5 min', id: 1, factor: 300 },[Validators.required]]);
+    this.durationCtrl = new FormControl([
+      { name: '5 min', id: 1, factor: 300 },
+      [Validators.required],
+    ]);
   }
 
-  displayAdress =  displayAdress;
+  displayAdress = displayAdress;
   utils = utils;
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
-  async startStream(){
-
-    let receiver:string = this.receiveCtrl.value;
+  async startStream() {
+    let receiver: string = this.receiveCtrl.value;
     if (isAddress(receiver) == false) {
       alert('addresse is not valid');
       return;
     }
-
-    let flowRate = ((10 * 10**18)/(24*3600)).toFixed(0) // 10 tokens per day
-    let duration = 3000
-
-    let data = utils.defaultAbiCoder.encode(['string','uint256'],[receiver,duration])
+    this.store.dispatch(Web3Actions.chainBusy({ status: true }));
+    let flowRate = ((10 * 10 ** 18) / (24 * 3600)).toFixed(0); // 10 tokens per day
+    let duration = 3000;
+    console.log(receiver);
+    let data = utils.defaultAbiCoder.encode(
+      ['address', 'uint256'],
+      [receiver, duration]
+    );
+    let deco = utils.defaultAbiCoder.decode(['address', 'uint256'], data);
+    console.log(deco);
 
     const config: {
       flowRate: string;
       receiver: string;
-      superToken:string;
+      superToken: string;
       data: string;
-    } = { flowRate,receiver:this.dapp.DAPP_STATE.gelatoSuperAppContract?.address!,superToken:this.superToken,data}
+    } = {
+      flowRate,
+      receiver: this.dapp.DAPP_STATE.gelatoSuperAppContract?.address!,
+      superToken: this.superToken,
+      data,
+    };
 
     await this.superfluidService.startStream(config);
-
-
+    this.store.dispatch(Web3Actions.chainBusy({ status: false }));
+ 
   }
 
-  async planStartAndStopStream(){
-
-  } 
+  async planStartAndStopStream() {}
 
   override async hookContractConnected(): Promise<void> {
-    this.contractaddress = this.defaultContract.address;
+    this.contractaddress = this.dapp.DAPP_STATE.gelatoSuperAppContract?.address!;
 
     this.taskTreasuryContract = ITaskTreasury__factory.connect(
       this.taskTreasury,
       this.dapp.signer!
     );
+    this.store.dispatch(Web3Actions.refreshBalances({ refreshBalance: true }));
+    this.refresh();
+    this.store.dispatch(Web3Actions.refreshBalances({refreshBalance:false}));
+  
+    // this.treasuryDeposit()
 
-     // this.treasuryDeposit()
-
-   // await this.getTreasuryBalance()
-
+    // await this.getTreasuryBalance()
   }
 
-    // ============= =============  TREASURY USER Interaction ============= ============= //
+  // ============= =============  TREASURY USER Interaction ============= ============= //
   // #region TREASURY Interaction
 
   async widthDrawTreasury() {
@@ -100,7 +115,7 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
     await doSignerTransaction(
       this.dapp.partyAppContract?.instance.withdrawGelato()!
     );
-     this.store.dispatch(Web3Actions.refreshBalances({refreshBalance:true}));
+    this.store.dispatch(Web3Actions.refreshBalances({ refreshBalance: true }));
     await this.refresh();
     this.store.dispatch(Web3Actions.chainBusy({ status: false }));
   }
@@ -114,7 +129,7 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
     let value = utils.parseEther(this.treasuryCtrl.value.toString());
     this.store.dispatch(Web3Actions.chainBusy({ status: true }));
     await doSignerTransaction(
-      this.dapp.partyAppContract?.instance.fundGelato(value, { value: value })!
+      this.dapp.gelatoSuperAppContract?.instance.fundGelato(value, { value: value })!
     );
     await this.refresh();
     this.store.dispatch(Web3Actions.refreshBalances({ refreshBalance: true }));
@@ -122,7 +137,6 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
   }
 
   //  #endregion TREASURY Interaction
-
 
   async getSuperAppBalance() {
     this.superAppBalance =
@@ -141,7 +155,5 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
   async refresh() {
     await this.getTreasuryBalance();
     await this.getSuperAppBalance();
-
   }
-
 }

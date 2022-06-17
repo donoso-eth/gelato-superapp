@@ -68,7 +68,8 @@ export interface IFUNCION_CALL_RESULT {
 
 export interface ITRANSACTION_RESULT {
   success:boolean,
-  payload:any;
+  payload:any,
+  txHash:string,
   error_message?:string
 
 

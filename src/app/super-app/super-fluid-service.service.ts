@@ -61,6 +61,7 @@ export class SuperFluidService {
       resolverAddress: settings[this.dapp.dappConfig.defaultNetwork].resolver,
     });
 
+
     this.flow = this.sf.cfaV1;
 
 

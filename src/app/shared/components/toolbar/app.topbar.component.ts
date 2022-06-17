@@ -25,7 +25,7 @@ export class AppTopBarComponent extends DappBaseComponent {
   constructor(private router: Router, dapp: DappInjector, store: Store<Web3State>) {
     super(dapp, store);
     this.localUserCtrl.valueChanges.pipe(takeUntil(this.destroyHooks)).subscribe((val) => {
-     // this.dapp.localWallet(val);
+      this.dapp.localWallet(val);
      // this.router.navigateByUrl('landing');
     });
   }
@@ -48,9 +48,9 @@ export class AppTopBarComponent extends DappBaseComponent {
 
   async  connect() {
 
-    //this.dapp.localWallet(1)
+    this.dapp.localWallet(1)
   
-    this.dapp.launchWebModal()
+   // this.dapp.launchWebModal()
    
     // this.router.navigate(['party'])
       

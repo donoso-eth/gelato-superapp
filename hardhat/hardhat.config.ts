@@ -16,12 +16,12 @@ const ALCHEMY_ID_MUMBAI = 'YOUR KEY'; //process.env["ALCHEMY_ID_MUMBAI"]
 
 dotenv.config();
 
-//// import task files when types have already been created
-// if (existsSync('./typechain-types')) {
-//   glob.sync('./tasks/**/*.ts').forEach(function (file: any) {
-//     require(resolve(file));
-//   });
-// }
+// import task files when types have already been created
+if (existsSync('./typechain-types')) {
+  glob.sync('./tasks/**/*.ts').forEach(function (file: any) {
+    require(resolve(file));
+  });
+}
 
 
 // You need to export an object to set up your config
