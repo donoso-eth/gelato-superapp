@@ -2,18 +2,13 @@
     <div class="col-12">
         <div class="card">
             <h5 class="text-center">Gelato Super App<br>
-                <span *ngIf="!!contractaddress" style="font-size: smaller"
-                >{{ displayAdress(contractaddress) }}
-              </span>
-              <i
-              class="pi pi-copy"
-              style="font-size: 1rem; cursor: pointer"
-              [cdkCopyToClipboard]="contractaddress"
-            ></i>
-            <br />
-         <span *ngIf="!!superAppBalance"
-              >{{ utils.formatEther(superAppBalance!) }} ETH
-            </span> 
+                <span *ngIf="!!contractaddress" style="font-size: smaller">{{ displayAdress(contractaddress) }}
+                </span>
+                <i class="pi pi-copy" style="font-size: 1rem; cursor: pointer"
+                    [cdkCopyToClipboard]="contractaddress"></i>
+                <br />
+                <span *ngIf="!!superAppBalance">{{ utils.formatEther(superAppBalance!) }} ETH
+                </span>
             </h5>
             <p-divider> </p-divider>
             <div class="grid">
@@ -23,26 +18,25 @@
                             <span *ngIf="!!contractaddress"
                                 style="font-size: smaller;">{{displayAdress(contractaddress)}} </span> <i
                                 class="pi pi-copy" style="font-size: 1rem" [cdkCopyToClipboard]="contractaddress "></i>
-                                <br />
-                                <span *ngIf="!!treasurybalance"
-                                  >{{ utils.formatEther(treasurybalance) }} ETH
-                                </span>
-                            </h5>
+                            <br />
+                            <span *ngIf="!!treasurybalance">{{ utils.formatEther(treasurybalance) }} ETH
+                            </span>
+                        </h5>
 
                     </div>
                     <div class="grid p-fluid">
                         <div class="col-8">
-                            <p-inputNumber mode="decimal"  [step]="0.1"  [formControl]="treasuryCtrl"
-                            [showButtons]="true" placeholder="Fund Treasury" [min]="0" [max]="100">
+                            <p-inputNumber mode="decimal" [step]="0.1" [formControl]="treasuryCtrl" [showButtons]="true"
+                                placeholder="Fund Treasury" [min]="0" [max]="100">
                             </p-inputNumber>
 
                         </div>
                         <div class="col-4">
-                            <p-button   (click)="treasuryDeposit()" label="Fund" class="mt-2"></p-button>
+                            <p-button (click)="treasuryDeposit()" label="Fund" class="mt-2"></p-button>
                         </div>
 
                         <div class="col-12">
-                            <button  (click)="widthDrawTreasury()" pButton pRipple type="button" label="withdraw"
+                            <button (click)="widthDrawTreasury()" pButton pRipple type="button" label="withdraw"
                                 class="p-button-raised p-button-warning mr-2 mb-2"></button>
 
                         </div>
@@ -51,46 +45,40 @@
 
                         </p-divider>
                         <user-balance *ngIf="blockchain_status == 'wallet-connected'"></user-balance>
-      
-                        <div class=" col-12 p-inputgroup">
-
-                            <input [formControl]="receiveCtrl" pInputText type="text" placeholder="Receiver" />
-                        </div>
-                        <div class="col-12">
-                            <p-dropdown [options]="streamDuration" [formControl]="durationCtrl"
-                                placeholder="Stop stream in">
-                                <ng-template pTemplate="selectedItem">
-                                    <div style="display:inline-flex" class="country-item country-item-value">
-                                        <div>{{durationCtrl.value.name}}</div>
-                                    </div>
-                                </ng-template>
-                                <ng-template let-duration pTemplate="duration">
-                                    <div class="flex align-items-center">
-
-                                        <span>{{duration.name}}</span>
-                                    </div>
-                                </ng-template>
-                            </p-dropdown>
-                        </div>
-                        <div class="col-12">
-                            <p-button (click)="startStream()" label="Create Automated Stream" class="mt-2"></p-button>
-
-                        </div>
-
-
                     </div>
                 </div>
-              
-                    <p-divider layout="vertical">
-        
-                    </p-divider>
-             
-                <div *ngIf="bonusGranted==false" class="col-6 flex align-items-center justify-content-center">
-                    <h1 style="font-size:350px;">?</h1>
+
+                <p-divider layout="vertical">
+
+                </p-divider>
 
 
-                </div>
-                <div class="col-6 flex align-items-center flex-column justify-content-start" *ngIf="bonusGranted==true">
+                <div class="col-6 flex align-items-center flex-column justify-content-start">
+                    <div class=" col-12 p-inputgroup">
+
+                        <input [formControl]="receiveCtrl" pInputText type="text" placeholder="Receiver" />
+                    </div>
+                    <h1 *ngIf="bonusGranted==false" style="font-size:350px;">?</h1>
+                    <div *ngIf="bonusGranted==true" class="col-12">
+                        <p-dropdown [options]="streamDuration" [formControl]="durationCtrl"
+                            placeholder="Stop stream in">
+                            <ng-template pTemplate="selectedItem">
+                                <div style="display:inline-flex" class="country-item country-item-value">
+                                    <div>{{durationCtrl.value.name}}</div>
+                                </div>
+                            </ng-template>
+                            <ng-template let-duration pTemplate="duration">
+                                <div class="flex align-items-center">
+
+                                    <span>{{duration.name}}</span>
+                                </div>
+                            </ng-template>
+                        </p-dropdown>
+                    </div>
+                    <div class="col-12">
+                        <p-button (click)="startStream()" label="Create Automated Stream" class="mt-2"></p-button>
+
+                    </div>
                     <h5 class="text-center">Bonus !! <br>
                         Automate Start and Stop Stream
                     </h5>

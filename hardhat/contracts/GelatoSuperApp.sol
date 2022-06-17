@@ -105,9 +105,22 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable  {
 
 
 
-  function startTask(uint256 _amount) external payable {
-    require(msg.value == 0.1 ether, "NOT-BALANCE");
-    // (bool success, ) = address(0x527a819db1eb0e34426297b03bae11F2f8B3A19E).call{value: 0.1 ether}("");
+  function startStream(address sender,address receiver, uint256 duration, int96 flowRate) external payable {
+    
+    bytes memory userData = abi.encode(300,receiver);
+
+    host.callAgreement(
+        cfa,
+        abi.encodeWithSelector(
+          cfa.createFlow.selector,
+          superToken,
+          sender,
+          receiver,
+          userData // placeholder
+        ),
+        "0x"
+      );
+
   }
 
     function cancelTask() public {
