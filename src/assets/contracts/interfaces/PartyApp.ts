@@ -23,9 +23,9 @@ export interface PartyAppInterface extends utils.Interface {
     "ETH()": FunctionFragment;
     "cancelTask()": FunctionFragment;
     "cancelTaskById(bytes32)": FunctionFragment;
-    "checker()": FunctionFragment;
     "checkerCancel(address)": FunctionFragment;
     "checkerNoPrepayment()": FunctionFragment;
+    "checkerStartParty()": FunctionFragment;
     "createTask()": FunctionFragment;
     "createTaskAndCancel()": FunctionFragment;
     "createTaskNoPrepayment()": FunctionFragment;
@@ -33,6 +33,7 @@ export interface PartyAppInterface extends utils.Interface {
     "gelato()": FunctionFragment;
     "headacheFinish()": FunctionFragment;
     "headachePresent()": FunctionFragment;
+    "headacheStart()": FunctionFragment;
     "lastPartyStart()": FunctionFragment;
     "ops()": FunctionFragment;
     "owner()": FunctionFragment;
@@ -40,6 +41,7 @@ export interface PartyAppInterface extends utils.Interface {
     "startParty()": FunctionFragment;
     "startPartyNoPrepayment()": FunctionFragment;
     "startPartyandCancel(address)": FunctionFragment;
+    "taskIdByUser(address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "treasury()": FunctionFragment;
     "withdrawContract()": FunctionFragment;
@@ -55,13 +57,16 @@ export interface PartyAppInterface extends utils.Interface {
     functionFragment: "cancelTaskById",
     values: [BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: "checker", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "checkerCancel",
     values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "checkerNoPrepayment",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "checkerStartParty",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -90,6 +95,10 @@ export interface PartyAppInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "headacheStart",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "lastPartyStart",
     values?: undefined
   ): string;
@@ -112,6 +121,10 @@ export interface PartyAppInterface extends utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(
+    functionFragment: "taskIdByUser",
+    values: [string]
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
@@ -131,13 +144,16 @@ export interface PartyAppInterface extends utils.Interface {
     functionFragment: "cancelTaskById",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "checker", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "checkerCancel",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "checkerNoPrepayment",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "checkerStartParty",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "createTask", data: BytesLike): Result;
@@ -160,6 +176,10 @@ export interface PartyAppInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "headacheStart",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "lastPartyStart",
     data: BytesLike
   ): Result;
@@ -176,6 +196,10 @@ export interface PartyAppInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "startPartyandCancel",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "taskIdByUser",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -245,16 +269,16 @@ export interface PartyApp extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    checker(
-      overrides?: CallOverrides
-    ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
-
     checkerCancel(
       user: string,
       overrides?: CallOverrides
     ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
 
     checkerNoPrepayment(
+      overrides?: CallOverrides
+    ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
+
+    checkerStartParty(
       overrides?: CallOverrides
     ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
 
@@ -283,6 +307,10 @@ export interface PartyApp extends BaseContract {
 
     headachePresent(overrides?: CallOverrides): Promise<[boolean]>;
 
+    headacheStart(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     lastPartyStart(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     ops(overrides?: CallOverrides): Promise<[string]>;
@@ -305,6 +333,8 @@ export interface PartyApp extends BaseContract {
       user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    taskIdByUser(arg0: string, overrides?: CallOverrides): Promise<[string]>;
 
     transferOwnership(
       newOwner: string,
@@ -333,16 +363,16 @@ export interface PartyApp extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  checker(
-    overrides?: CallOverrides
-  ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
-
   checkerCancel(
     user: string,
     overrides?: CallOverrides
   ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
 
   checkerNoPrepayment(
+    overrides?: CallOverrides
+  ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
+
+  checkerStartParty(
     overrides?: CallOverrides
   ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
 
@@ -371,6 +401,10 @@ export interface PartyApp extends BaseContract {
 
   headachePresent(overrides?: CallOverrides): Promise<boolean>;
 
+  headacheStart(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   lastPartyStart(overrides?: CallOverrides): Promise<BigNumber>;
 
   ops(overrides?: CallOverrides): Promise<string>;
@@ -393,6 +427,8 @@ export interface PartyApp extends BaseContract {
     user: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  taskIdByUser(arg0: string, overrides?: CallOverrides): Promise<string>;
 
   transferOwnership(
     newOwner: string,
@@ -419,16 +455,16 @@ export interface PartyApp extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    checker(
-      overrides?: CallOverrides
-    ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
-
     checkerCancel(
       user: string,
       overrides?: CallOverrides
     ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
 
     checkerNoPrepayment(
+      overrides?: CallOverrides
+    ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
+
+    checkerStartParty(
       overrides?: CallOverrides
     ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
 
@@ -446,6 +482,8 @@ export interface PartyApp extends BaseContract {
 
     headachePresent(overrides?: CallOverrides): Promise<boolean>;
 
+    headacheStart(overrides?: CallOverrides): Promise<void>;
+
     lastPartyStart(overrides?: CallOverrides): Promise<BigNumber>;
 
     ops(overrides?: CallOverrides): Promise<string>;
@@ -459,6 +497,8 @@ export interface PartyApp extends BaseContract {
     startPartyNoPrepayment(overrides?: CallOverrides): Promise<void>;
 
     startPartyandCancel(user: string, overrides?: CallOverrides): Promise<void>;
+
+    taskIdByUser(arg0: string, overrides?: CallOverrides): Promise<string>;
 
     transferOwnership(
       newOwner: string,
@@ -495,11 +535,11 @@ export interface PartyApp extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    checker(overrides?: CallOverrides): Promise<BigNumber>;
-
     checkerCancel(user: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     checkerNoPrepayment(overrides?: CallOverrides): Promise<BigNumber>;
+
+    checkerStartParty(overrides?: CallOverrides): Promise<BigNumber>;
 
     createTask(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -526,6 +566,10 @@ export interface PartyApp extends BaseContract {
 
     headachePresent(overrides?: CallOverrides): Promise<BigNumber>;
 
+    headacheStart(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     lastPartyStart(overrides?: CallOverrides): Promise<BigNumber>;
 
     ops(overrides?: CallOverrides): Promise<BigNumber>;
@@ -548,6 +592,8 @@ export interface PartyApp extends BaseContract {
       user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    taskIdByUser(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     transferOwnership(
       newOwner: string,
@@ -577,8 +623,6 @@ export interface PartyApp extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    checker(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     checkerCancel(
       user: string,
       overrides?: CallOverrides
@@ -587,6 +631,8 @@ export interface PartyApp extends BaseContract {
     checkerNoPrepayment(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    checkerStartParty(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     createTask(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -613,6 +659,10 @@ export interface PartyApp extends BaseContract {
 
     headachePresent(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    headacheStart(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     lastPartyStart(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     ops(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -634,6 +684,11 @@ export interface PartyApp extends BaseContract {
     startPartyandCancel(
       user: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    taskIdByUser(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     transferOwnership(

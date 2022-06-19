@@ -18,6 +18,35 @@ import { FunctionFragment, Result, EventFragment } from "@ethersproject/abi";
 import { Listener, Provider } from "@ethersproject/providers";
 import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
+export type StreamConfigStruct = {
+  sender: string;
+  receiver: string;
+  duration: BigNumberish;
+  flowRate: BigNumberish;
+};
+
+export type StreamConfigStructOutput = [
+  string,
+  string,
+  BigNumber,
+  BigNumber
+] & {
+  sender: string;
+  receiver: string;
+  duration: BigNumber;
+  flowRate: BigNumber;
+};
+
+export type PlanStreamStruct = {
+  plannedStart: BigNumberish;
+  stream: StreamConfigStruct;
+};
+
+export type PlanStreamStructOutput = [BigNumber, StreamConfigStructOutput] & {
+  plannedStart: BigNumber;
+  stream: StreamConfigStructOutput;
+};
+
 export interface GelatoSuperAppInterface extends utils.Interface {
   functions: {
     "ETH()": FunctionFragment;
@@ -31,21 +60,25 @@ export interface GelatoSuperAppInterface extends utils.Interface {
     "cancelTask()": FunctionFragment;
     "cancelTaskbyId(bytes32)": FunctionFragment;
     "cfa()": FunctionFragment;
-    "checker(address,address)": FunctionFragment;
+    "checkerPlanStream((address,address,uint256,int96))": FunctionFragment;
+    "checkerStopPlanStream(address,address)": FunctionFragment;
+    "checkerStopStream(address,address)": FunctionFragment;
     "count()": FunctionFragment;
     "fundGelato(uint256)": FunctionFragment;
     "gelato()": FunctionFragment;
     "host()": FunctionFragment;
+    "isBonusReady()": FunctionFragment;
     "ops()": FunctionFragment;
     "owner()": FunctionFragment;
+    "planStream((uint256,(address,address,uint256,int96)))": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "startTask(uint256)": FunctionFragment;
-    "stopstream(address,address)": FunctionFragment;
+    "startStream((address,address,uint256,int96))": FunctionFragment;
+    "stopPlannedStream(address,address)": FunctionFragment;
+    "stopStream(address,address)": FunctionFragment;
     "taskIdByUser(address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "treasury()": FunctionFragment;
     "withdraw()": FunctionFragment;
-    "withdrawContract()": FunctionFragment;
     "withdrawGelato()": FunctionFragment;
   };
 
@@ -88,7 +121,15 @@ export interface GelatoSuperAppInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "cfa", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "checker",
+    functionFragment: "checkerPlanStream",
+    values: [StreamConfigStruct]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "checkerStopPlanStream",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "checkerStopStream",
     values: [string, string]
   ): string;
   encodeFunctionData(functionFragment: "count", values?: undefined): string;
@@ -98,18 +139,30 @@ export interface GelatoSuperAppInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "gelato", values?: undefined): string;
   encodeFunctionData(functionFragment: "host", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "isBonusReady",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "ops", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "planStream",
+    values: [PlanStreamStruct]
+  ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "startTask",
-    values: [BigNumberish]
+    functionFragment: "startStream",
+    values: [StreamConfigStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: "stopstream",
+    functionFragment: "stopPlannedStream",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "stopStream",
     values: [string, string]
   ): string;
   encodeFunctionData(
@@ -122,10 +175,6 @@ export interface GelatoSuperAppInterface extends utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "treasury", values?: undefined): string;
   encodeFunctionData(functionFragment: "withdraw", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "withdrawContract",
-    values?: undefined
-  ): string;
   encodeFunctionData(
     functionFragment: "withdrawGelato",
     values?: undefined
@@ -166,19 +215,42 @@ export interface GelatoSuperAppInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "cfa", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "checker", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "checkerPlanStream",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "checkerStopPlanStream",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "checkerStopStream",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "count", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "fundGelato", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "gelato", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "host", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "isBonusReady",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "ops", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "planStream", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "startTask", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "stopstream", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "startStream",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "stopPlannedStream",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "stopStream", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "taskIdByUser",
     data: BytesLike
@@ -189,10 +261,6 @@ export interface GelatoSuperAppInterface extends utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "treasury", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "withdrawContract",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(
     functionFragment: "withdrawGelato",
     data: BytesLike
@@ -315,7 +383,18 @@ export interface GelatoSuperApp extends BaseContract {
 
     cfa(overrides?: CallOverrides): Promise<[string]>;
 
-    checker(
+    checkerPlanStream(
+      stream: StreamConfigStruct,
+      overrides?: CallOverrides
+    ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
+
+    checkerStopPlanStream(
+      sender: string,
+      receiver: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
+
+    checkerStopStream(
       sender: string,
       receiver: string,
       overrides?: CallOverrides
@@ -332,20 +411,35 @@ export interface GelatoSuperApp extends BaseContract {
 
     host(overrides?: CallOverrides): Promise<[string]>;
 
+    isBonusReady(
+      overrides?: CallOverrides
+    ): Promise<[boolean] & { bonusReady: boolean }>;
+
     ops(overrides?: CallOverrides): Promise<[string]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
+
+    planStream(
+      config: PlanStreamStruct,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    startTask(
-      _amount: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    startStream(
+      stream: StreamConfigStruct,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    stopstream(
+    stopPlannedStream(
+      sender: string,
+      receiver: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    stopStream(
       sender: string,
       receiver: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -361,10 +455,6 @@ export interface GelatoSuperApp extends BaseContract {
     treasury(overrides?: CallOverrides): Promise<[string]>;
 
     withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    withdrawContract(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -445,7 +535,18 @@ export interface GelatoSuperApp extends BaseContract {
 
   cfa(overrides?: CallOverrides): Promise<string>;
 
-  checker(
+  checkerPlanStream(
+    stream: StreamConfigStruct,
+    overrides?: CallOverrides
+  ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
+
+  checkerStopPlanStream(
+    sender: string,
+    receiver: string,
+    overrides?: CallOverrides
+  ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
+
+  checkerStopStream(
     sender: string,
     receiver: string,
     overrides?: CallOverrides
@@ -462,20 +563,33 @@ export interface GelatoSuperApp extends BaseContract {
 
   host(overrides?: CallOverrides): Promise<string>;
 
+  isBonusReady(overrides?: CallOverrides): Promise<boolean>;
+
   ops(overrides?: CallOverrides): Promise<string>;
 
   owner(overrides?: CallOverrides): Promise<string>;
+
+  planStream(
+    config: PlanStreamStruct,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   renounceOwnership(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  startTask(
-    _amount: BigNumberish,
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  startStream(
+    stream: StreamConfigStruct,
+    overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  stopstream(
+  stopPlannedStream(
+    sender: string,
+    receiver: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  stopStream(
     sender: string,
     receiver: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -491,10 +605,6 @@ export interface GelatoSuperApp extends BaseContract {
   treasury(overrides?: CallOverrides): Promise<string>;
 
   withdraw(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  withdrawContract(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -576,7 +686,18 @@ export interface GelatoSuperApp extends BaseContract {
 
     cfa(overrides?: CallOverrides): Promise<string>;
 
-    checker(
+    checkerPlanStream(
+      stream: StreamConfigStruct,
+      overrides?: CallOverrides
+    ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
+
+    checkerStopPlanStream(
+      sender: string,
+      receiver: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean, string] & { canExec: boolean; execPayload: string }>;
+
+    checkerStopStream(
       sender: string,
       receiver: string,
       overrides?: CallOverrides
@@ -590,15 +711,31 @@ export interface GelatoSuperApp extends BaseContract {
 
     host(overrides?: CallOverrides): Promise<string>;
 
+    isBonusReady(overrides?: CallOverrides): Promise<boolean>;
+
     ops(overrides?: CallOverrides): Promise<string>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
+    planStream(
+      config: PlanStreamStruct,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
-    startTask(_amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
+    startStream(
+      stream: StreamConfigStruct,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
-    stopstream(
+    stopPlannedStream(
+      sender: string,
+      receiver: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    stopStream(
       sender: string,
       receiver: string,
       overrides?: CallOverrides
@@ -614,8 +751,6 @@ export interface GelatoSuperApp extends BaseContract {
     treasury(overrides?: CallOverrides): Promise<string>;
 
     withdraw(overrides?: CallOverrides): Promise<boolean>;
-
-    withdrawContract(overrides?: CallOverrides): Promise<boolean>;
 
     withdrawGelato(overrides?: CallOverrides): Promise<void>;
   };
@@ -707,7 +842,18 @@ export interface GelatoSuperApp extends BaseContract {
 
     cfa(overrides?: CallOverrides): Promise<BigNumber>;
 
-    checker(
+    checkerPlanStream(
+      stream: StreamConfigStruct,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    checkerStopPlanStream(
+      sender: string,
+      receiver: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    checkerStopStream(
       sender: string,
       receiver: string,
       overrides?: CallOverrides
@@ -724,20 +870,33 @@ export interface GelatoSuperApp extends BaseContract {
 
     host(overrides?: CallOverrides): Promise<BigNumber>;
 
+    isBonusReady(overrides?: CallOverrides): Promise<BigNumber>;
+
     ops(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    planStream(
+      config: PlanStreamStruct,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    startTask(
-      _amount: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    startStream(
+      stream: StreamConfigStruct,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    stopstream(
+    stopPlannedStream(
+      sender: string,
+      receiver: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    stopStream(
       sender: string,
       receiver: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -753,10 +912,6 @@ export interface GelatoSuperApp extends BaseContract {
     treasury(overrides?: CallOverrides): Promise<BigNumber>;
 
     withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    withdrawContract(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -841,7 +996,18 @@ export interface GelatoSuperApp extends BaseContract {
 
     cfa(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    checker(
+    checkerPlanStream(
+      stream: StreamConfigStruct,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    checkerStopPlanStream(
+      sender: string,
+      receiver: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    checkerStopStream(
       sender: string,
       receiver: string,
       overrides?: CallOverrides
@@ -858,20 +1024,33 @@ export interface GelatoSuperApp extends BaseContract {
 
     host(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    isBonusReady(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     ops(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    planStream(
+      config: PlanStreamStruct,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     renounceOwnership(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    startTask(
-      _amount: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    startStream(
+      stream: StreamConfigStruct,
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    stopstream(
+    stopPlannedStream(
+      sender: string,
+      receiver: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    stopStream(
       sender: string,
       receiver: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -890,10 +1069,6 @@ export interface GelatoSuperApp extends BaseContract {
     treasury(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     withdraw(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    withdrawContract(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
