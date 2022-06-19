@@ -1,3 +1,3 @@
 import  './super_app_tests';
 
-import './gelato_app_test';
+import './party_app_test';

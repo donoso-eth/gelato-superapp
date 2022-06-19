@@ -1,6 +1,6 @@
 # Gelato & Supefluid
 
-This project showcases general purpose examples of automating sart contracts with gelato as well as the application for superfluid streams presenting a very simple 3-steps guide to create programmable cash flows
+This project showcases general-purpose examples of automating smart contracts with gelato as well as the application for superfluid streams presenting a very simple 3-step guide to creating programmable cash flows
 
 ## Showcase Dapp
 The showcase dapp can be found in:

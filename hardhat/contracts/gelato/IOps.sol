@@ -109,4 +109,9 @@ interface IOps {
     address _feeToken,
     bytes32 _resolverHash
   ) external pure returns (bytes32);
+
+    /// @notice Helper func to query the _selector of a function you want to automate
+    /// @param _func String of the function you want the selector from
+    /// @dev Example: "transferFrom(address,address,uint256)" => 0x23b872dd
+    function getSelector(string calldata _func) external pure returns (bytes4);
 }

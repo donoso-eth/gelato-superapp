@@ -17,7 +17,7 @@ contract PartyApp is OpsReady, Ownable {
   using Counters for Counters.Counter;
 
   uint256 public lastPartyStart = 0;
-  bool public headachePresent = false;
+  bool public headachePresent = true;
 
   mapping(address => bytes32) taskIdByUser;
 
@@ -27,12 +27,9 @@ contract PartyApp is OpsReady, Ownable {
     lastPartyStart = block.timestamp;
   }
 
-  // ============= =============  USER Misc ============= ============= //
+  // ============= =============  USER  ============= ============= //
   // #region USER Misc
 
-  function headacheFinish() public {
-    headachePresent = false;
-  }
 
   // #endregion USER Misc
 
@@ -69,20 +66,24 @@ contract PartyApp is OpsReady, Ownable {
     taskIdByUser[msg.sender] = taskId;
   }
 
-  function createTask() public {
-    require(taskIdByUser[msg.sender] == bytes32(0), "TASK_STILL_ACTIVE");
 
-    bytes32 taskId = IOps(ops).createTask(
-      address(this),
-      /// sdad
-      this.startParty.selector,
-      address(this),
-      abi.encodeWithSelector(this.checker.selector)
-    );
-    taskIdByUser[msg.sender] = taskId;
+
+
+  // #endregion TASK Interaction
+
+   // ============= =============  ADMIN && TREASURY ============= ============= //
+   // #region ADMIN && TREASURY
+
+  // Change Headache status to 'No headacche'
+    function headacheFinish() public {
+    headachePresent = false;
   }
 
-  function cancelTask() public {
+    function headacheStart() public {
+    headachePresent = true;
+  }
+
+    function cancelTask() public {
     bytes32 _taskId = taskIdByUser[msg.sender];
     require(_taskId != bytes32(0), "NO_TASK_AVAILABLE");
     IOps(ops).cancelTask(_taskId);
@@ -93,11 +94,6 @@ contract PartyApp is OpsReady, Ownable {
     IOps(ops).cancelTask(_taskId);
     taskIdByUser[msg.sender] = bytes32(0);
   }
-
-  // #endregion TASK Interaction
-
-  // ============= =============  TREASURY USER Interaction ============= ============= //
-  // #region TREASURY Interaction
 
   function fundGelato(uint256 amount) public payable {
     require(msg.value == amount, "NO_FUNDING");
@@ -124,28 +120,57 @@ contract PartyApp is OpsReady, Ownable {
     return result;
   }
 
-  // #endregion TREASURY Interaction
+  // #endregion ADMIN && TREASURY
 
-  // ============= =============  GELATO Interaction ============= ============= //
-  // #region GELATO Interaction
+    // ============= ============= Create Simple Task Use Case Business Logic  ============= ============= //
+    // #region Create Simple Task Use Case Business Logic 
 
-  function checker()
+    /**************************************************************************
+     * Stop Stream Use Case Business Logic
+     *
+     * Step 1 : createTask() 
+     *          - will create a gelato task
+     *          - will store the taskId
+     *
+     * Step 2 : checkerstartParty() Function.
+     *          - Check If the task can be executed , in rhis case if we have not headache
+     *          - returns the execPayload of startParty()
+     *
+     * Step 3 : Executable Function: startParty()
+     *          - will Start the party setting lastPartyStrt to block.timestamo
+     *          - will cause a headache
+     *************************************************************************/
+    
+    function createTask() public {
+    require(taskIdByUser[msg.sender] == bytes32(0), "TASK_STILL_ACTIVE");
+
+    bytes32 taskId = IOps(ops).createTask(
+      address(this), /// Contract executing the task
+      this.startParty.selector, /// Executable function's selector
+      address(this), /// Resolver contract, in our case will be the same
+      abi.encodeWithSelector(this.checkerStartParty.selector) /// Checker Condition
+    );
+    taskIdByUser[msg.sender] = taskId;
+  }
+
+  function checkerStartParty()
     external
     view
     returns (bool canExec, bytes memory execPayload)
   {
-    // block.timestamp - lastPartyStart > 300 &&
     canExec = headachePresent == false;
-
     execPayload = abi.encodeWithSelector(this.startParty.selector);
   }
 
   function startParty() external onlyOps {
     require(headachePresent == false, "NOT_READY");
-    // require(block.timestamp - lastPartyStart > 180, "NOT_YET_TIME");
     lastPartyStart = block.timestamp;
     headachePresent = true;
   }
+
+  // #endregion Create Simple Task Use Case Business Logic 
+
+
 
   function checkerCancel(address user)
     external
