@@ -157,12 +157,6 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
     }
 
     //// Withdraw  Contract
-    function withdrawContract() external onlyOwner returns (bool) {
-        (bool result, ) = payable(msg.sender).call{
-            value: address(this).balance
-        }("");
-        return result;
-    }
 
     function withdraw() external returns (bool) {
         (bool result, ) = payable(msg.sender).call{
@@ -325,10 +319,11 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
                 this.checkerPlanStream.selector,
                 config.stream
             ),
-            ETH,
+           ETH,
             true
         );
         taskIdByUser[config.stream.sender] = taskId;
+        console.logBytes32(taskId);
     }
 
     function checkerPlanStream(StreamConfig memory stream)

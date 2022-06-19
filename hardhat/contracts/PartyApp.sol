@@ -19,7 +19,7 @@ contract PartyApp is OpsReady, Ownable {
   uint256 public lastPartyStart = 0;
   bool public headachePresent = true;
 
-  mapping(address => bytes32) taskIdByUser;
+  mapping(address => bytes32) public taskIdByUser;
 
   constructor(address payable _ops, address payable _treasury)
     OpsReady(_ops, payable(_treasury))
@@ -150,7 +150,11 @@ contract PartyApp is OpsReady, Ownable {
       address(this), /// Resolver contract, in our case will be the same
       abi.encodeWithSelector(this.checkerStartParty.selector) /// Checker Condition
     );
+
+
     taskIdByUser[msg.sender] = taskId;
+
+
   }
 
   function checkerStartParty()
