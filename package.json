@@ -12,7 +12,7 @@
     "fork": "cd hardhat && npx hardhat --tsconfig ./tsconfig.hardhat.json node  --network hardhat",
     "deploy": "cd hardhat && npx hardhat --tsconfig ./tsconfig.hardhat.json run ./scripts/deploy.ts",
     "contracts:test": "cd hardhat && npx hardhat --tsconfig ./tsconfig.hardhat.json test",
-    "contracts:coverage": "cd hardhat && npx hardhat --tsconfig ./tsconfig.hardhat.json coverage",
+    "contracts:coverage": "cd hardhat && npx hardhat --tsconfig ./tsconfig.hardhat.json coverage --network hardhat",
     "watch-contract": "cd hardhat && nodehelpers/watch.js",
     "watch-tinker": "cd hardhat && nodehelpers/tinker-watch.js",
     "wire": "cd hardhat && npx hardhat --tsconfig ./tsconfig.hardhat.json run .helpers/wire.ts",
@@ -97,7 +97,7 @@
     "prettier": "^2.3.2",
     "prettier-plugin-solidity": "^1.0.0-beta.13",
     "solhint": "^3.3.6",
-    "solidity-coverage": "^0.7.16",
+    "solidity-coverage": "^0.7.21",
     "ts-node": "^10.1.0",
     "typechain": "6.0.5",
     "typescript": "~4.6.2"
