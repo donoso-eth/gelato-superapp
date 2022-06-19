@@ -19,7 +19,6 @@ import {
   ConstantFlowAgreementV1,
 } from '@superfluid-finance/sdk-core';
 import { PlanStreamStruct } from '../typechain-types/GelatoSuperApp';
-import { getTimestamp } from '../helpers/utils';
 
 const gelatoAddress = '0x25aD59adbe00C2d80c86d01e2E05e1294DA84823';
 const ETH = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';

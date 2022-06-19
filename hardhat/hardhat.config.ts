@@ -30,7 +30,7 @@ if (existsSync('./typechain-types')) {
 const mainnetGwei = 21;
 
 
-const defaultNetwork = 'localhost';
+const defaultNetwork = 'mumbai';
 
 const config: HardhatUserConfig = {
   solidity: {
