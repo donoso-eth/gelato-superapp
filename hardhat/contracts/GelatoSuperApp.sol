@@ -99,6 +99,7 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
 
     // endregion
 
+
     // ============= =============  ADMIN && TREASURY ============= ============= //
     // #region ADMIN && TREASURY
 
@@ -175,6 +176,7 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
     }
 
     // #endregion ADMIN && TREASURY 
+
 
     // ============= ============= Stop Stream Use Case Business Logic ============= ============= //
     // #region Stop Stream Use Case Business Logic
@@ -280,6 +282,7 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
     }
 
     // #endregion Stop Stream Use Case Business Logic
+
 
     // ============= ============= Start and Stop Stream Bonus Track#1 ============= ============= //
     // #region Plan Future Start and Future Stop
@@ -415,6 +418,7 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
     }
 
     // #endregion Plan Future Start and Future Stop
+
 
     // ============= ============= SuperApp callbacks and helpers ============= ============= //
     // #region Stop SuperApp callbacks
