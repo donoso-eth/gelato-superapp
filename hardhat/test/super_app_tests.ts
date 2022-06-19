@@ -47,7 +47,7 @@ let sf: Framework;
 let flow:ConstantFlowAgreementV1;
 let planStreamConfig:PlanStreamStruct
 let result;
-describe.only("Ops Automate Start/Stop stream", function () {
+describe("Ops Automate Start/Stop stream", function () {
  
 
   before(async function () {

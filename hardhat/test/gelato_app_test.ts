@@ -16,7 +16,7 @@ import { ethers } from 'hardhat';
 
 const gelatoAddress = "0x25aD59adbe00C2d80c86d01e2E05e1294DA84823";
 const ETH = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-const THREE_MINUTES = 3 * 60;
+const FIVE_MINUTES = 5 * 60;
 const FEETOKEN = hre.ethers.constants.AddressZero;
 let GELATO_OPS = '0xB3f5503f93d5Ef84b06993a1975B9D21B962892F';
 let GELATO_TREASURY = '0x527a819db1eb0e34426297b03bae11F2f8B3A19E';
@@ -52,7 +52,7 @@ describe('Ops createTimedTask test', function () {
 
     executorAddress = gelatoAddress;
 
-    //await taskTreasury.updateWhitelistedService(ops.address, true);
+
 
     const depositAmount = ethers.utils.parseEther('1');
     await taskTreasury
@@ -147,7 +147,7 @@ describe('Ops createTimedTask test', function () {
   });
 
   it('Exec should succeed when time elapse', async () => {
-    await hre.network.provider.send('evm_increaseTime', [THREE_MINUTES]);
+    await hre.network.provider.send('evm_increaseTime', [FIVE_MINUTES]);
     await hre.network.provider.send('evm_mine', []);
 
     const nextExecBefore = (await ops.timedTask(taskId)).nextExec;
@@ -189,7 +189,7 @@ describe('Ops createTimedTask test', function () {
   });
 
   it('Exec should succeed even if txn fails', async () => {
-    await hre.network.provider.send('evm_increaseTime', [THREE_MINUTES]);
+    await hre.network.provider.send('evm_increaseTime', [FIVE_MINUTES]);
     await hre.network.provider.send('evm_mine', []);
 
     const nextExecBefore = (await ops.timedTask(taskId)).nextExec;
@@ -230,7 +230,7 @@ describe('Ops createTimedTask test', function () {
   });
 
   it('should skip one interval', async () => {
-    await hre.network.provider.send('evm_increaseTime', [2 * THREE_MINUTES]);
+    await hre.network.provider.send('evm_increaseTime', [2 * FIVE_MINUTES]);
     await hre.network.provider.send('evm_mine', []);
 
     const nextExecBefore = (await ops.timedTask(taskId)).nextExec;
@@ -268,12 +268,12 @@ describe('Ops createTimedTask test', function () {
       ethers.utils.parseEther('0.7')
     );
     expect(Number(nextExecAfter.sub(nextExecBefore))).to.be.eql(
-      2 * THREE_MINUTES
+      2 * FIVE_MINUTES
     );
   });
 
   it('Should account for drift', async () => {
-    await hre.network.provider.send('evm_increaseTime', [50 * THREE_MINUTES]);
+    await hre.network.provider.send('evm_increaseTime', [50 * FIVE_MINUTES]);
     await hre.network.provider.send('evm_mine', []);
 
     await ops
