@@ -16,418 +16,522 @@ import {OpsReady} from "./gelato/OpsReady.sol";
 import {IOps} from "./gelato/IOps.sol";
 import {ITaskTreasury} from "./gelato/ITaskTreasury.sol";
 
-
 struct PlanStream {
-  uint256 plannedStart;
-  StreamConfig stream;
-
+    uint256 plannedStart;
+    StreamConfig stream;
 }
 
 struct StreamConfig {
-  address sender;
-  address receiver;
-  uint256 duration;
-  int96 flowRate;
+    address sender;
+    address receiver;
+    uint256 duration;
+    int96 flowRate;
 }
 
+contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
+    using SafeMath for uint256;
+    using Counters for Counters.Counter;
 
+    uint256 lastExecuted;
+    uint256 public count;
 
-contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable  {
-  using SafeMath for uint256;
-  using Counters for Counters.Counter;
+    bool fundContractFlag = false;
+    bool createStreamFlag = false;
+    bool stopStreamFlag = false;
 
-  uint256 lastExecuted;
-  uint256 public count;
+    ISuperfluid public host; // host
+    IConstantFlowAgreementV1 public cfa; // the stored constant flow agreement class address
+    ISuperToken superToken;
 
-  ISuperfluid public host; // host
-  IConstantFlowAgreementV1 public cfa; // the stored constant flow agreement class address
-  ISuperToken superToken;
+    using CFAv1Library for CFAv1Library.InitData;
+    CFAv1Library.InitData internal _cfaLib;
 
-  using CFAv1Library for CFAv1Library.InitData;
-  CFAv1Library.InitData internal _cfaLib;
+    mapping(address => bytes32) public taskIdByUser;
+    mapping(bytes32 => address) public addressdByTaskId;
 
-  mapping(address => bytes32) public taskIdByUser;
-  mapping(bytes32 => address) public addressdByTaskId;
+    constructor(
+        ISuperfluid _host,
+        ISuperToken _superToken,
+        address payable _ops,
+        address _treasury
+    ) OpsReady(_ops, payable(_treasury)) {
+        host = _host;
 
-  constructor(
-    ISuperfluid _host,
-    ISuperToken _superToken,
-    address payable _ops,
-    address _treasury
-  ) OpsReady(_ops, payable(_treasury)) {
-    host = _host;
+        superToken = _superToken;
+        cfa = IConstantFlowAgreementV1(
+            address(
+                host.getAgreementClass(
+                    keccak256(
+                        "org.superfluid-finance.agreements.ConstantFlowAgreement.v1"
+                    )
+                )
+            )
+        );
 
-    superToken = _superToken;
-    cfa = IConstantFlowAgreementV1(
-      address(
-        host.getAgreementClass(
-          keccak256(
-            "org.superfluid-finance.agreements.ConstantFlowAgreement.v1"
-          )
-        )
-      )
-    );
+        _cfaLib = CFAv1Library.InitData(_host, cfa);
 
-     _cfaLib = CFAv1Library.InitData(_host, cfa);
+        uint256 configWord = SuperAppDefinitions.APP_LEVEL_FINAL |
+            SuperAppDefinitions.BEFORE_AGREEMENT_CREATED_NOOP |
+            SuperAppDefinitions.BEFORE_AGREEMENT_UPDATED_NOOP |
+            SuperAppDefinitions.BEFORE_AGREEMENT_TERMINATED_NOOP;
 
-    uint256 configWord = SuperAppDefinitions.APP_LEVEL_FINAL |
-      SuperAppDefinitions.BEFORE_AGREEMENT_CREATED_NOOP |
-      SuperAppDefinitions.BEFORE_AGREEMENT_UPDATED_NOOP |
-      SuperAppDefinitions.BEFORE_AGREEMENT_TERMINATED_NOOP;
+        host.registerApp(configWord);
 
-    host.registerApp(configWord);
+        lastExecuted = block.timestamp;
+    }
 
-    lastExecuted = block.timestamp;
-  }
+    // ============= =============  Modifiers ============= ============= //
+    // #region Modidiers
 
-  // ============= =============  Modifiers ============= ============= //
-  // #region Modidiers
+    modifier onlyHost() {
+        require(
+            msg.sender == address(host),
+            "RedirectAll: support only one host"
+        );
+        _;
+    }
 
-  modifier onlyHost() {
-    require(msg.sender == address(host), "RedirectAll: support only one host");
-    _;
-  }
+    modifier onlyExpected(ISuperToken _superToken, address agreementClass) {
+        require(_isSameToken(_superToken), "RedirectAll: not accepted token");
+        require(_isCFAv1(agreementClass), "RedirectAll: only CFAv1 supported");
+        _;
+    }
 
-  modifier onlyExpected(ISuperToken _superToken, address agreementClass) {
-    require(_isSameToken(_superToken), "RedirectAll: not accepted token");
-    require(_isCFAv1(agreementClass), "RedirectAll: only CFAv1 supported");
-    _;
-  }
+    // endregion
 
-  // endregion
+    // ============= =============  ADMIN && TREASURY ============= ============= //
+    // #region ADMIN && TREASURY
 
-    // ============= =============  TREASURY USER Interaction ============= ============= //
-  // #region TREASURY Interaction
+    //// Check if bonus track is available
+    function isBonusReady() public view returns (bool bonusReady) {
+        if (
+            taskIdByUser[msg.sender] == bytes32(0) &&
+            fundContractFlag == true &&
+            createStreamFlag == true &&
+            stopStreamFlag == true
+        ) {
+            bonusReady = true;
+        } else {
+            bonusReady = false;
+        }
+    }
 
-  function fundGelato(uint256 amount) public payable {
-    require(msg.value == amount, "NO_FUNDING");
-    ITaskTreasury(treasury).depositFunds{value: amount}(
-      address(this),
-      ETH,
-      amount
-    );
-  }
+    //// Cancel Task
+    function cancelTask() public {
+        bytes32 _taskId = taskIdByUser[msg.sender];
+        require(_taskId != bytes32(0), "NO_TASK_AVAILABLE");
+        IOps(ops).cancelTask(_taskId);
+        taskIdByUser[msg.sender] = bytes32(0);
+    }
 
-  function withdrawGelato() public onlyOwner {
-    uint256 maxAmount = ITaskTreasury(treasury).userTokenBalance(
-      address(this),
-      ETH
-    );
+    //// Cancel Task by Id
+    function cancelTaskbyId(bytes32 _taskId) public {
+        IOps(ops).cancelTask(_taskId);
+        taskIdByUser[msg.sender] = bytes32(0);
+    }
 
-    ITaskTreasury(treasury).withdrawFunds(payable(msg.sender), ETH, maxAmount);
-  }
+    //// Fund Gelato Treasury
+    function fundGelato(uint256 amount) public payable {
+        require(msg.value == amount, "NO_FUNDING");
+        ITaskTreasury(treasury).depositFunds{value: amount}(
+            address(this),
+            ETH,
+            amount
+        );
+        fundContractFlag = true;
+    }
 
-  function withdrawContract() external onlyOwner returns (bool) {
-    (bool result, ) = payable(msg.sender).call{value: address(this).balance}(
-      ""
-    );
-    return result;
-  }
+    //// Withdraw Gelato Treasury
+    function withdrawGelato() public onlyOwner {
+        uint256 maxAmount = ITaskTreasury(treasury).userTokenBalance(
+            address(this),
+            ETH
+        );
 
-  // #endregion TREASURY Interaction
+        ITaskTreasury(treasury).withdrawFunds(
+            payable(msg.sender),
+            ETH,
+            maxAmount
+        );
+    }
 
+    //// Withdraw  Contract
+    function withdrawContract() external onlyOwner returns (bool) {
+        (bool result, ) = payable(msg.sender).call{
+            value: address(this).balance
+        }("");
+        return result;
+    }
 
-  function planStream(PlanStream memory config)external {
+    function withdraw() external returns (bool) {
+        (bool result, ) = payable(msg.sender).call{
+            value: address(this).balance
+        }("");
+        return result;
+    }
 
-      console.log(block.timestamp + config.plannedStart);
+    receive() external payable {
+        // your code here…
+    }
 
-      bytes32 taskId = IOps(ops).createTimedTask(
-      uint128(block.timestamp + config.plannedStart),
-      3600,
-      address(this),
-      this.startStream.selector,
-      address(this),
-      abi.encodeWithSelector(this.checkerPlanStream.selector, config.stream),
-      ETH,
-      true
-    );
-      taskIdByUser[config.stream.sender] = taskId;
+    // #endregion ADMIN && TREASURY 
 
-  }
+    // ============= ============= Stop Stream Use Case Business Logic ============= ============= //
+    // #region Stop Stream Use Case Business Logic
 
-  function checkerPlanStream(StreamConfig memory stream)   external
-    view
-    returns (bool canExec, bytes memory execPayload)
-  {
-    canExec = true;
-    console.log(stream.receiver);
-    execPayload = abi.encodeWithSelector(
-      this.startStream.selector,
-      stream
-    );
-  }
+    /**************************************************************************
+     * Stop Stream Use Case Business Logic
+     *
+     * Step 1 : createStopStreamTask() Internal function call from the super app callback
+     *          (after created Stream in which also a stream will be created to the receiver)
+     *          - will create a gelato timed task that will lauchh with start-time at the desired duration of the stream
+     *          - will store the taskId
+     *
+     * Step 2 : checkerStopStream() Function.
+     *          - always return "canExec = true" as we are only waiting to the time to execure
+     *          - returns the execPayload of stopStream()
+     *
+     * Step 3 : Executable Function: stopStream()
+     *          - will stop the outcoming stream from super app to receiver
+     *          - will stop the incoming stream from sender to super app
+     *          - will cancel the task so it only be executed once (no need to stop the stream twice)
+     *************************************************************************/
 
-  function startStream(StreamConfig memory stream) external onlyOps {
-    
-   // bytes memory userData = abi.encode(stream.duration,stream.receiver);
-    console.log(stream.sender);
-    console.log(stream.receiver);
-    console.log('streaming start');
-    _cfaLib.createFlowByOperator(
-      stream.sender,
-      stream.receiver,
-      superToken,
-      stream.flowRate,
-      "0x"
-    );
+    function createStopStreamTask(
+        uint256 duration,
+        address sender,
+        address to
+    ) internal {
+        bytes32 taskId = IOps(ops).createTimedTask(
+            uint128(block.timestamp + duration),
+            3600,
+            address(this),
+            this.stopStream.selector,
+            address(this),
+            abi.encodeWithSelector(this.checkerStopStream.selector, sender, to),
+            ETH,
+            true
+        );
+        taskIdByUser[sender] = taskId;
+        createStreamFlag = true;
+    }
 
+    function checkerStopStream(address sender, address receiver)
+        external
+        pure
+        returns (bool canExec, bytes memory execPayload)
+    {
+        canExec = true;
 
+        execPayload = abi.encodeWithSelector(
+            this.stopStream.selector,
+            address(sender),
+            address(receiver)
+        );
+    }
 
-    //// cancelprevoius task
+    function stopStream(address sender, address receiver) external onlyOps {
+        //// check if
 
-    bytes32 oldTaskId = taskIdByUser[stream.sender];
-    cancelTaskbyId(oldTaskId);
+        /////// STOP IF EXISTS outcoming stream
+        (, int96 outFlowRate, , ) = cfa.getFlow(
+            superToken,
+            address(this),
+            receiver
+        );
 
-    //// create new timed at
-
-      bytes32 taskId = IOps(ops).createTimedTask(
-      uint128(block.timestamp + stream.duration),
-      3600,
-      address(this),
-      this.stopPlannedStream.selector,
-      address(this),
-      abi.encodeWithSelector(this.checkerStopPlanStream.selector, stream.sender,stream.receiver),
-      ETH,
-      true
-    );
-      taskIdByUser[stream.sender] = taskId;
-  }
-
-
-  function checkerStopPlanStream(address sender, address receiver)   external
-    view
-    returns (bool canExec, bytes memory execPayload)
-  {
-    canExec = true;
-
-    execPayload = abi.encodeWithSelector(
-      this.stopPlannedStream.selector,
-      address(sender),
-      address(receiver)
-    );
-  }
-
-
-
-  function stopPlannedStream(address sender, address receiver) external onlyOps{
-
+        if (outFlowRate > 0) {
+            host.callAgreement(
+                cfa,
+                abi.encodeWithSelector(
+                    cfa.deleteFlow.selector,
+                    superToken,
+                    address(this),
+                    receiver,
+                    new bytes(0) // placeholder
+                ),
+                "0x"
+            );
+        }
 
         /////// STOP IF EXISTS incoming stream
-    (, int96 inFlowRate, , ) = cfa.getFlow(superToken, sender,receiver);
+        (, int96 inFlowRate, , ) = cfa.getFlow(
+            superToken,
+            sender,
+            address(this)
+        );
 
-    console.log(uint96(inFlowRate));
-    if (inFlowRate > 0) {
-      host.callAgreement(
-        cfa,
-        abi.encodeWithSelector(
-          cfa.deleteFlow.selector,
-          superToken,
-          sender,
-          receiver,
-          new bytes(0) // placeholder
-        ),
-        "0x"
-      );
-    }
-    bytes32 _taskId = taskIdByUser[sender];
-    cancelTaskbyId(_taskId);
-
-
-  }
-
-
-
-
-    function cancelTask() public {
-    bytes32 _taskId = taskIdByUser[msg.sender];
-    require(_taskId != bytes32(0), "NO_TASK_AVAILABLE");
-    IOps(ops).cancelTask(_taskId);
-    taskIdByUser[msg.sender] = bytes32(0);
-  }
-
-
-  function cancelTaskbyId(bytes32 _taskId)public {
-    IOps(ops).cancelTask(_taskId);
-     taskIdByUser[msg.sender] = bytes32(0);
-  }
-
-  function stopstream(address sender, address receiver) external onlyOps {
-    //// check if
-
-
-    /////// STOP IF EXISTS outcoming stream
-    (, int96 outFlowRate, , ) = cfa.getFlow(superToken,address(this),receiver);
-
-    if (outFlowRate > 0) {
-      host.callAgreement(
-        cfa,
-        abi.encodeWithSelector(
-          cfa.deleteFlow.selector,
-          superToken,
-          address(this),
-          receiver,
-          new bytes(0) // placeholder
-        ),
-        "0x"
-      );
+        if (inFlowRate > 0) {
+            host.callAgreement(
+                cfa,
+                abi.encodeWithSelector(
+                    cfa.deleteFlow.selector,
+                    superToken,
+                    sender,
+                    address(this),
+                    new bytes(0) // placeholder
+                ),
+                "0x"
+            );
+        }
+        bytes32 _taskId = taskIdByUser[sender];
+        cancelTaskbyId(_taskId);
+        stopStreamFlag = true;
     }
 
-    /////// STOP IF EXISTS incoming stream
-    (, int96 inFlowRate, , ) = cfa.getFlow(superToken, sender, address(this));
+    // #endregion Stop Stream Use Case Business Logic
 
-    if (inFlowRate > 0) {
-      host.callAgreement(
-        cfa,
-        abi.encodeWithSelector(
-          cfa.deleteFlow.selector,
-          superToken,
-          sender,
-          address(this),
-          new bytes(0) // placeholder
-        ),
-        "0x"
-      );
-    }
-    bytes32 _taskId = taskIdByUser[sender];
-    cancelTaskbyId(_taskId);
+    // ============= ============= Start and Stop Stream Bonus Track#1 ============= ============= //
+    // #region Plan Future Start and Future Stop
 
-  }
-
-  function checker(address sender, address receiver)
-    external
-    view
-    returns (bool canExec, bytes memory execPayload)
-  {
-    canExec = true;
-
-    execPayload = abi.encodeWithSelector(
-      this.stopstream.selector,
-      address(sender),
-      address(receiver)
-    );
-  }
-
-  function withdraw() external returns (bool) {
-    (bool result, ) = payable(msg.sender).call{value: address(this).balance}(
-      ""
-    );
-    return result;
-  }
-
-  receive() external payable {
-    // your code here…
-  }
-
-  /**************************************************************************
-   * SuperApp callbacks
-   *************************************************************************/
-
-  function afterAgreementCreated(
-    ISuperToken _superToken,
-    address _agreementClass,
-    bytes32, // _agreementId,
-    bytes calldata _agreementData,
-    bytes calldata, // _cbdata,
-    bytes calldata _ctx
-  )
-    external
-    override
-    onlyExpected(_superToken, _agreementClass)
-    onlyHost
-    returns (bytes memory newCtx)
-  {
-    newCtx = _ctx;
-
-    (address sender, address receiver) = abi.decode(
-      _agreementData,
-      (address, address)
-    );
-    ISuperfluid.Context memory decodedContext = host.decodeCtx(_ctx);
-
-    (address to, uint256 duration) = abi.decode(
-      decodedContext.userData,
-      (address, uint256)
-    );
-    console.log(duration);
-    console.log(to);
-    (, int96 inFlowRate, , ) = cfa.getFlow(superToken, sender, address(this));
-
-    (newCtx, ) = host.callAgreementWithContext(
-      cfa,
-      abi.encodeWithSelector(
-        cfa.createFlow.selector,
-        superToken,
-        to,
-        inFlowRate,
-        new bytes(0) // placeholder
-      ),
-      "0x",
-      newCtx
-    );
+    /**************************************************************************
+     * Start and Stop Stream Use Case Business Logic
+     * What makes this use case special is that we are concatenating two use cases
+     * Start Stream(a) and StopStream (b) being the Start Stream Step 3a, the Stop Steam Step 1b
+     *
+     * Step 1a : createStopStreamTask() Internal function call from the super app callback
+     *          (after created Stream in which also a stream will be created to the receiver)
+     *          - will create a gelato timed task that will lauchh with start-time at the desired duration of the stream
+     *          - will store the taskId
+     *
+     * Step 2a : checkerStopStream() Function.
+     *          - always return "canExec = true" as we are only waiting to the time to execure
+     *          - returns the execPayload of stopStream()
+     *
+     * Step 3a and 1b : Executable Function: stopStream()
+     *                  - will stop the outcoming stream from super app to receiver
+     *                  - will stop the incoming stream from sender to super app
+     *                  - will cancel the task so it only
+     *
+     * Step 2b:
+     *
+     *
+     * Step 3
+     *************************************************************************/
     
-    bytes32 taskId = IOps(ops).createTimedTask(
-      uint128(block.timestamp + duration),
-      180,
-      address(this),
-      this.stopstream.selector,
-      address(this),
-      abi.encodeWithSelector(this.checker.selector, sender,to),
-      ETH,
-      true
-    );
-      taskIdByUser[sender] = taskId;
-    //registerGelato and set call back find stream
+    function planStream(PlanStream memory config) external {
+        console.log(block.timestamp + config.plannedStart);
 
-    return newCtx;
-  }
+        bytes32 taskId = IOps(ops).createTimedTask(
+            uint128(block.timestamp + config.plannedStart),
+            3600,
+            address(this),
+            this.startStream.selector,
+            address(this),
+            abi.encodeWithSelector(
+                this.checkerPlanStream.selector,
+                config.stream
+            ),
+            ETH,
+            true
+        );
+        taskIdByUser[config.stream.sender] = taskId;
+    }
 
-  function afterAgreementTerminated(
-    ISuperToken, /*superToken*/
-    address, /*agreementClass*/
-    bytes32, // _agreementId,
-    bytes calldata _agreementData,
-    bytes calldata, /*cbdata*/
-    bytes calldata _ctx
-  ) external virtual override returns (bytes memory newCtx) {
-    (address sender, ) = abi.decode(_agreementData, (address, address));
+    function checkerPlanStream(StreamConfig memory stream)
+        external
+        view
+        returns (bool canExec, bytes memory execPayload)
+    {
+        canExec = true;
+        console.log(stream.receiver);
+        execPayload = abi.encodeWithSelector(this.startStream.selector, stream);
+    }
 
-    newCtx = _ctx;
-  }
+    function startStream(StreamConfig memory stream) external onlyOps {
+        // bytes memory userData = abi.encode(stream.duration,stream.receiver);
+        console.log(stream.sender);
+        console.log(stream.receiver);
+        console.log("streaming start");
+        _cfaLib.createFlowByOperator(
+            stream.sender,
+            stream.receiver,
+            superToken,
+            stream.flowRate,
+            "0x"
+        );
 
-  function afterAgreementUpdated(
-    ISuperToken _superToken,
-    address _agreementClass,
-    bytes32, // _agreementId,
-    bytes calldata _agreementData,
-    bytes calldata, //_cbdata,
-    bytes calldata _ctx
-  )
-    external
-    override
-    onlyExpected(_superToken, _agreementClass)
-    onlyHost
-    returns (bytes memory newCtx)
-  {
-    newCtx = _ctx;
-    (address sender, address receiver) = abi.decode(
-      _agreementData,
-      (address, address)
-    );
+        //// cancelprevoius task
 
-    (, int96 inFlowRate, , ) = cfa.getFlow(superToken, sender, address(this));
-  }
+        bytes32 oldTaskId = taskIdByUser[stream.sender];
+        cancelTaskbyId(oldTaskId);
 
-  /**************************************************************************
-   * INTERNAL HELPERS
-   *************************************************************************/
+        //// create new timed at
 
-  function _isCFAv1(address agreementClass) private view returns (bool) {
-    return
-      ISuperAgreement(agreementClass).agreementType() ==
-      keccak256("org.superfluid-finance.agreements.ConstantFlowAgreement.v1");
-  }
+        bytes32 taskId = IOps(ops).createTimedTask(
+            uint128(block.timestamp + stream.duration),
+            3600,
+            address(this),
+            this.stopPlannedStream.selector,
+            address(this),
+            abi.encodeWithSelector(
+                this.checkerStopPlanStream.selector,
+                stream.sender,
+                stream.receiver
+            ),
+            ETH,
+            true
+        );
+        taskIdByUser[stream.sender] = taskId;
+    }
 
-  function _isSameToken(ISuperToken _superToken) private view returns (bool) {
-    return address(_superToken) == address(superToken);
-  }
+    function checkerStopPlanStream(address sender, address receiver)
+        external
+        pure
+        returns (bool canExec, bytes memory execPayload)
+    {
+        canExec = true;
+
+        execPayload = abi.encodeWithSelector(
+            this.stopPlannedStream.selector,
+            address(sender),
+            address(receiver)
+        );
+    }
+
+    function stopPlannedStream(address sender, address receiver)
+        external
+        onlyOps
+    {
+        /////// STOP IF EXISTS incoming stream
+        (, int96 inFlowRate, , ) = cfa.getFlow(superToken, sender, receiver);
+
+        console.log(uint96(inFlowRate));
+        if (inFlowRate > 0) {
+            host.callAgreement(
+                cfa,
+                abi.encodeWithSelector(
+                    cfa.deleteFlow.selector,
+                    superToken,
+                    sender,
+                    receiver,
+                    new bytes(0) // placeholder
+                ),
+                "0x"
+            );
+        }
+        bytes32 _taskId = taskIdByUser[sender];
+        cancelTaskbyId(_taskId);
+    }
+
+    // #endregion Plan Future Start and Future Stop
+
+    // ============= ============= SuperApp callbacks and helpers ============= ============= //
+    // #region Stop SuperApp callbacks
+
+    /**************************************************************************
+     * SuperApp callbacks
+     *************************************************************************/
+
+    function afterAgreementCreated(
+        ISuperToken _superToken,
+        address _agreementClass,
+        bytes32, // _agreementId,
+        bytes calldata _agreementData,
+        bytes calldata, // _cbdata,
+        bytes calldata _ctx
+    )
+        external
+        override
+        onlyExpected(_superToken, _agreementClass)
+        onlyHost
+        returns (bytes memory newCtx)
+    {
+        newCtx = _ctx;
+
+        (address sender, address receiver) = abi.decode(
+            _agreementData,
+            (address, address)
+        );
+
+        ISuperfluid.Context memory decodedContext = host.decodeCtx(_ctx);
+
+        (address to, uint256 duration) = abi.decode(
+            decodedContext.userData,
+            (address, uint256)
+        );
+
+        (, int96 inFlowRate, , ) = cfa.getFlow(
+            superToken,
+            sender,
+            address(this)
+        );
+
+        /// start stream to receiver
+        (newCtx, ) = host.callAgreementWithContext(
+            cfa,
+            abi.encodeWithSelector(
+                cfa.createFlow.selector,
+                superToken,
+                to,
+                inFlowRate,
+                new bytes(0) // placeholder
+            ),
+            "0x",
+            newCtx
+        );
+
+        //Create the stop stream taks in gelato
+        createStopStreamTask(duration, sender, to);
+
+        return newCtx;
+    }
+
+    function afterAgreementTerminated(
+        ISuperToken, /*superToken*/
+        address, /*agreementClass*/
+        bytes32, // _agreementId,
+        bytes calldata _agreementData,
+        bytes calldata, /*cbdata*/
+        bytes calldata _ctx
+    ) external virtual override returns (bytes memory newCtx) {
+        (address sender, ) = abi.decode(_agreementData, (address, address));
+
+        newCtx = _ctx;
+    }
+
+    function afterAgreementUpdated(
+        ISuperToken _superToken,
+        address _agreementClass,
+        bytes32, // _agreementId,
+        bytes calldata _agreementData,
+        bytes calldata, //_cbdata,
+        bytes calldata _ctx
+    )
+        external
+        override
+        onlyExpected(_superToken, _agreementClass)
+        onlyHost
+        returns (bytes memory newCtx)
+    {
+        newCtx = _ctx;
+        (address sender, address receiver) = abi.decode(
+            _agreementData,
+            (address, address)
+        );
+
+        (, int96 inFlowRate, , ) = cfa.getFlow(
+            superToken,
+            sender,
+            address(this)
+        );
+    }
+
+    /**************************************************************************
+     * INTERNAL HELPERS
+     *************************************************************************/
+
+    function _isCFAv1(address agreementClass) private view returns (bool) {
+        return
+            ISuperAgreement(agreementClass).agreementType() ==
+            keccak256(
+                "org.superfluid-finance.agreements.ConstantFlowAgreement.v1"
+            );
+    }
+
+    function _isSameToken(ISuperToken _superToken) private view returns (bool) {
+        return address(_superToken) == address(superToken);
+    }
+
+    // #endregion Stop SuperApp callbacks
 }
