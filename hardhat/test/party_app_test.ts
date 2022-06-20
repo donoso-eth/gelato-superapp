@@ -15,7 +15,7 @@ import * as hre from 'hardhat';
 
 import { ethers } from 'hardhat';
 import { JsonRpcProvider } from '@ethersproject/providers';
-import { parseEther } from 'ethers/lib/utils';
+import { formatEther, parseEther } from 'ethers/lib/utils';
 
 
 const gelatoAddress = '0x25aD59adbe00C2d80c86d01e2E05e1294DA84823';
@@ -115,7 +115,7 @@ describe('Party app Tests', function () {
     await partyApp.headacheStart();
   });
 
-  it('it should create a task ans stored cirrectly the taskid', async () => {
+  it('it should create a task ans stored correctly the taskid', async () => {
     await partyApp.createTask();
 
     execData = await partyApp.interface.encodeFunctionData('startParty');
@@ -288,5 +288,120 @@ describe('Party app Tests', function () {
 
   });
 
+
+ // ============= ============= Create Simple Task WITHOUT Prepayment Use Case Business Logic  ============= ============= //
+ it('it should revert when Contract has no funds ', async () => { 
+  await expect(partyApp.createTaskNoPrepayment()).to.be.revertedWith('NO_FUNDING');
+});
+
+
+
+it('it should accept funds', async () => { 
+ 
+  let balanceBefore = await provider.getBalance(partyApp.address)
+ 
+  let  tx = {
+    to: partyApp.address,
+    value: parseEther("10")
+};
+
+await deployer.sendTransaction(tx);
+
+let balanceAfter = await provider.getBalance(partyApp.address)
+
+expect(+balanceAfter-+balanceBefore).to.equal(10*10**18)
+
+});
+
+
+ it('it should create no-prepayment task with the correct Task ID', async () => { 
+ 
+  let  tx = {
+    to: partyApp.address,
+    value: parseEther("10")
+};
+
+await deployer.sendTransaction(tx);
+ 
+  await partyApp.createTaskNoPrepayment();
+
+
+  execData = await partyApp.interface.encodeFunctionData('startPartyNoPrepayment');
+  execAddress = partyApp.address;
+  execSelector = await ops.getSelector('startPartyNoPrepayment()');
+  resolverAddress = partyApp.address;
+  resolverData = await partyApp.interface.encodeFunctionData(
+    'checkerNoPrepayment'
+  )
+
+  resolverHash = ethers.utils.keccak256(
+    new ethers.utils.AbiCoder().encode(
+      ['address', 'bytes'],
+      [resolverAddress, resolverData]
+    )
+  );
+
+  taskId = await ops.getTaskId(
+    partyApp.address,
+    execAddress,
+    execSelector,
+    false,
+    ETH,
+    resolverHash
+  );
+
   
+  let storeId = await partyApp.taskIdByUser(deployerAddress)
+    expect(taskId).to.equal(storeId)
+  
+});
+
+it('it should Execshould Success no-prepayment task and decrease contract funds', async () => {
+  const [canExec, payload] = await partyApp.checkerStartParty();
+
+  let balanceBefore = (await provider.getBalance(partyApp.address)).toString()
+ 
+
+  await partyApp.headacheFinish();
+
+  
+
+  execData = await partyApp.interface.encodeFunctionData('startPartyNoPrepayment');
+  execAddress = partyApp.address;
+  execSelector = await ops.getSelector('startPartyNoPrepayment()');
+  resolverAddress = partyApp.address;
+  resolverData = await partyApp.interface.encodeFunctionData(
+    'checkerNoPrepayment'
+  )
+
+  resolverHash = ethers.utils.keccak256(
+    new ethers.utils.AbiCoder().encode(
+      ['address', 'bytes'],
+      [resolverAddress, resolverData]
+    )
+  );
+
+   await  ops
+    .connect(executor)
+    .exec(
+      ethers.utils.parseEther('0.1'),
+      ETH,
+      partyApp.address,
+      false,
+      true,
+      resolverHash,
+      execAddress,
+      execData
+    )
+  
+    let balanceAfter = (await provider.getBalance(partyApp.address)).toString()
+
+   let headeacheAfter = await partyApp.headachePresent();
+   expect(headeacheAfter).true;   
+
+   expect(+balanceBefore-(+balanceAfter)).to.equal(0.1 * 10**18)
+
+});
+
+
 });

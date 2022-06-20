@@ -81,8 +81,6 @@ interface IOps {
   /// @param _revertOnFailure To revert or not if call to execAddress fails
   /// @param _execAddress On which contract should Gelato execute the tx
   /// @param _execData Data used to execute the tx, queried from the Resolver by Gelato
-  // solhint-disable function-max-lines
-  // solhint-disable code-complexity
   function exec(
     uint256 _txFee,
     address _feeToken,
