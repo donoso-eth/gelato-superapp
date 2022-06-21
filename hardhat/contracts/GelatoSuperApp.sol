@@ -105,10 +105,6 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
 
     //// Check if bonus track is available
     function isBonusReady() public view returns (bool bonusReady) {
-        console.logBytes32(taskIdByUser[msg.sender]);
-        console.logBool(fundContractFlag);
-        console.logBool(createStreamFlag);
-        console.logBool(stopStreamFlag);
         if (
             taskIdByUser[msg.sender] == bytes32(0) &&
             fundContractFlag == true &&
