@@ -48,9 +48,9 @@ export class AppTopBarComponent extends DappBaseComponent {
 
   async  connect() {
 
-    this.dapp.localWallet(1)
+   // this.dapp.localWallet(1)
   
-   // this.dapp.launchWebModal()
+    this.dapp.launchWebModal()
    
     // this.router.navigate(['party'])
       
@@ -77,8 +77,7 @@ export class AppTopBarComponent extends DappBaseComponent {
   override async hookRefreshBalances(): Promise<void> {
 
        this.userbalance = await this.dapp.provider?.getBalance(this.dapp.signerAddress!);
-        console.log(this.userbalance)
-      //  this.store.dispatch(Web3Actions.refreshBalances({refreshBalance:false}));
+ 
   }
   
 }
