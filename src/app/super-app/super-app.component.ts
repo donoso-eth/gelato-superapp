@@ -22,8 +22,6 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
   taskTreasury = '0x527a819db1eb0e34426297b03bae11F2f8B3A19E';
   superToken = '0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f';
 
-  bonusGranted = true;
-
   taskTreasuryContract!: ITaskTreasury;
   treasurybalance: any;
   treasuryCtrl = new FormControl();
@@ -31,12 +29,13 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
   receiveCtrl: FormControl = new FormControl();
   startCtrl: FormControl = new FormControl();
   streamDuration = [
-    // { name: 'minutes', id: 0, factor: 60 },
+
     { name: '5 min', id: 1, factor: 300 },
     { name: '10 min', id: 2, factor: 600 },
     { name: '15 min', id: 3, factor: 900 },
   ];
   superAppBalance: any;
+  bonusGranted = false;
 
   constructor(
     dapp: DappInjector,
@@ -85,6 +84,7 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
     };
 
     await this.superfluidService.startStream(config);
+    this.refresh()
     this.store.dispatch(Web3Actions.chainBusy({ status: false }));
  
   }
@@ -155,5 +155,7 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
   async refresh() {
     await this.getTreasuryBalance();
     await this.getSuperAppBalance();
+    this.bonusGranted = await this.dapp.DAPP_STATE.gelatoSuperAppContract?.instance.isBonusReady()!
+    console.log(this.bonusGranted)
   }
 }

@@ -85,7 +85,7 @@ contract PartyApp is OpsReady, Ownable {
   // #region Create Simple Task Use Case Business Logic
 
   /**************************************************************************
-   * Stop Stream Use Case Business Logic
+   * Create Simple Task Use Case Business Logic
    *
    * Step 1 : createTask()
    *          - will create a gelato task
@@ -135,7 +135,7 @@ contract PartyApp is OpsReady, Ownable {
   // #region  Create Task and Cancel after one executio
 
   /**************************************************************************
-   * Stop Stream Use Case Business Logic
+   * Stop Create Task and Cancel 
    * Similar case as the first create imple task, the difference is that 
    * we are cancelling the task (it will only run once) after first execution
    *

@@ -50,24 +50,24 @@ export class UserBalanceComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const source = interval(500);
+    const source = interval(1000);
 
-    // this.balanceSubscription = source.subscribe(async (val) => {
-    //   const superToken = this.createSuperTokenInstance(
-    //     this.tokenObj.superToken,
-    //     this.dapp.signer!
-    //   );
+    this.balanceSubscription = source.subscribe(async (val) => {
+      const superToken = this.createSuperTokenInstance(
+        this.tokenObj.superToken,
+        this.dapp.signer!
+      );
 
-    //   const startMs = (new Date().getTime() / 1000).toFixed(0);
-    //   const balanceSupertoken = await superToken.realtimeBalanceOf(
-    //     this.dapp.signerAddress,
-    //     startMs
-    //   );
+      const startMs = (new Date().getTime() / 1000).toFixed(0);
+      const balanceSupertoken = await superToken.realtimeBalanceOf(
+        this.dapp.signerAddress,
+        startMs
+      );
 
-    //   this.tokenObj.superTokenBalance = (+utils.formatEther(
-    //     balanceSupertoken[0]
-    //   )).toFixed(6);
-    // });
+      this.tokenObj.superTokenBalance = (+utils.formatEther(
+        balanceSupertoken[0]
+      )).toFixed(6);
+     });
     this.refreshBalance();
   }
 
@@ -186,7 +186,9 @@ export class UserBalanceComponent implements OnInit, OnDestroy {
 
     this.tokenObj.tokenBalance = (+utils.formatEther(balanceToken)).toFixed(4);
 
-    //this.getRewardDetails(this.id)
+    
+    
+
   }
 
   createERC20Instance = (ERC: string, signer: Signer): Contract => {
@@ -197,3 +199,5 @@ export class UserBalanceComponent implements OnInit, OnDestroy {
     return new Contract(SuperToken, abi_SuperToken, signer);
   };
 }
+
+

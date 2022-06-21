@@ -58,7 +58,7 @@ export interface GelatoSuperAppInterface extends utils.Interface {
     "beforeAgreementTerminated(address,address,bytes32,bytes,bytes)": FunctionFragment;
     "beforeAgreementUpdated(address,address,bytes32,bytes,bytes)": FunctionFragment;
     "cancelTask()": FunctionFragment;
-    "cancelTaskbyId(bytes32)": FunctionFragment;
+    "cancelTaskbyId(bytes32,address)": FunctionFragment;
     "cfa()": FunctionFragment;
     "checkerPlanStream((address,address,uint256,int96))": FunctionFragment;
     "checkerStopPlanStream(address,address)": FunctionFragment;
@@ -117,7 +117,7 @@ export interface GelatoSuperAppInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "cancelTaskbyId",
-    values: [BytesLike]
+    values: [BytesLike, string]
   ): string;
   encodeFunctionData(functionFragment: "cfa", values?: undefined): string;
   encodeFunctionData(
@@ -378,6 +378,7 @@ export interface GelatoSuperApp extends BaseContract {
 
     cancelTaskbyId(
       _taskId: BytesLike,
+      sender: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -530,6 +531,7 @@ export interface GelatoSuperApp extends BaseContract {
 
   cancelTaskbyId(
     _taskId: BytesLike,
+    sender: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -681,6 +683,7 @@ export interface GelatoSuperApp extends BaseContract {
 
     cancelTaskbyId(
       _taskId: BytesLike,
+      sender: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -837,6 +840,7 @@ export interface GelatoSuperApp extends BaseContract {
 
     cancelTaskbyId(
       _taskId: BytesLike,
+      sender: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -991,6 +995,7 @@ export interface GelatoSuperApp extends BaseContract {
 
     cancelTaskbyId(
       _taskId: BytesLike,
+      sender: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

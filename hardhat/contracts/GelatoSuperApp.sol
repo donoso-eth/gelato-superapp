@@ -105,6 +105,10 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
 
     //// Check if bonus track is available
     function isBonusReady() public view returns (bool bonusReady) {
+        console.logBytes32(taskIdByUser[msg.sender]);
+        console.logBool(fundContractFlag);
+        console.logBool(createStreamFlag);
+        console.logBool(stopStreamFlag);
         if (
             taskIdByUser[msg.sender] == bytes32(0) &&
             fundContractFlag == true &&
@@ -126,9 +130,9 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
     }
 
     //// Cancel Task by Id
-    function cancelTaskbyId(bytes32 _taskId) public {
+    function cancelTaskbyId(bytes32 _taskId, address sender) public {
         IOps(ops).cancelTask(_taskId);
-        taskIdByUser[msg.sender] = bytes32(0);
+        taskIdByUser[sender] = bytes32(0);
     }
 
     //// Fund Gelato Treasury
@@ -271,7 +275,7 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
             );
         }
         bytes32 _taskId = taskIdByUser[sender];
-        cancelTaskbyId(_taskId);
+        cancelTaskbyId(_taskId,sender);
         stopStreamFlag = true;
     }
 
@@ -353,23 +357,23 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
         //// cancelprevoius task
 
         bytes32 oldTaskId = taskIdByUser[stream.sender];
-        cancelTaskbyId(oldTaskId);
+        cancelTaskbyId(oldTaskId, stream.sender);
 
         //// create new timed at
 
         bytes32 taskId = IOps(ops).createTimedTask(
             uint128(block.timestamp + stream.duration),//// timestamp at which the task should be first executed (stream should stop)
-            3600,
-            address(this),
-            this.stopPlannedStream.selector,
-            address(this),
+            3600, /// Interval between executions, we will cancel after the first
+            address(this), /// /// Contract executing the task 
+            this.stopPlannedStream.selector, /// Executable function's selector
+            address(this), /// Resolver contract, in our case will be the same
             abi.encodeWithSelector(
                 this.checkerStopPlanStream.selector,
                 stream.sender,
                 stream.receiver
-            ),
-            ETH,
-            true
+            ), /// Checker Condition
+            ETH, ///  feetoken
+            true /// we will use the treasury contract for funding 
         );
         taskIdByUser[stream.sender] = taskId;
     }
@@ -410,7 +414,7 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
             );
         }
         bytes32 _taskId = taskIdByUser[sender];
-        cancelTaskbyId(_taskId);
+        cancelTaskbyId(_taskId,sender);
     }
 
     // #endregion Plan Future Start and Future Stop

@@ -11,7 +11,7 @@
                 </span>
             </h5>
             <p-divider> </p-divider>
-            <div class="grid">
+            <div class="grid p-fluid">
                 <div class="col-5 flex align-items-center flex-column justify-content-start">
                     <div>
                         <h5 class="text-center">Using Gelato Treasury <br>
@@ -58,8 +58,8 @@
 
                         <input [formControl]="receiveCtrl" pInputText type="text" placeholder="Receiver" />
                     </div>
-                    <h1 *ngIf="bonusGranted==false" style="font-size:350px;">?</h1>
-                    <div *ngIf="bonusGranted==true" class="col-12">
+
+                    <div  class="col-12">
                         <p-dropdown [options]="streamDuration" [formControl]="durationCtrl"
                             placeholder="Stop stream in">
                             <ng-template pTemplate="selectedItem">
@@ -75,15 +75,20 @@
                             </ng-template>
                         </p-dropdown>
                     </div>
+
                     <div class="col-12">
-                        <p-button (click)="startStream()" label="Create Automated Stream" class="mt-2"></p-button>
+                        <p-button (click)="startStream()" label="Create Stream and Automate Stop" class="mt-2"></p-button>
 
                     </div>
-                    <h5 class="text-center">Bonus !! <br>
+
+                    <h1 *ngIf="bonusGranted==false" style="font-size:350px;">?</h1>
+             
+             
+                    <h5 *ngIf="bonusGranted==true" class="text-center">Bonus !! <br>
                         Automate Start and Stop Stream
                     </h5>
 
-                    <div class="grid p-fluid">
+                    <div  *ngIf="bonusGranted==true" class="grid p-fluid">
                         <div class=" col-12 p-inputgroup">
 
                             <input [formControl]="receiveCtrl" pInputText type="text" placeholder="Receiver" />
