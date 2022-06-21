@@ -190,7 +190,7 @@ contract PartyApp is OpsReady, Ownable {
   // #region Create Simple Task With NO Prepayment Use Case Business Logic
 
   /**************************************************************************
-   * Stop Stream Use Case Business Logic
+   * Create Simple Task With NO Prepayment Use Case Business Logic
    * The difference with the simple create task is we will transfer the execution gas fees
    * at the time of execution, for that we will require our contract to hold balance
    *
