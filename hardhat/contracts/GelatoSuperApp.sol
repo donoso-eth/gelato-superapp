@@ -184,7 +184,7 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
      *          - will store the taskId
      *
      * Step 2 : checkerStopStream() Function.
-     *          - always return "canExec = true" as we are only waiting to the time to execure
+     *          - always return "canExec = true" as we are only waiting to the time to execute
      *          - returns the execPayload of stopStream()
      *
      * Step 3 : Executable Function: stopStream()
@@ -199,14 +199,14 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
         address to
     ) internal {
         bytes32 taskId = IOps(ops).createTimedTask(
-            uint128(block.timestamp + duration),
-            3600,
-            address(this),
-            this.stopStream.selector,
-            address(this),
-            abi.encodeWithSelector(this.checkerStopStream.selector, sender, to),
-            ETH,
-            true
+            uint128(block.timestamp + duration), //// timestamp at which the task should befirst  executed (stream should stop)
+            3600, /// Interval between executions, we will cancel after the first
+            address(this), /// Contract executing the task
+            this.stopStream.selector,  /// Executable function's selector
+            address(this), /// Resolver contract, in our case will be the same
+            abi.encodeWithSelector(this.checkerStopStream.selector, sender, to),/// Checker Condition
+            ETH, ///  feetoken
+            true /// we will use the treasury contract for funding
         );
         taskIdByUser[sender] = taskId;
         createStreamFlag = true;
@@ -286,61 +286,62 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
      * What makes this use case special is that we are concatenating two use cases
      * Start Stream(a) and StopStream (b) being the Start Stream Step 3a, the Stop Steam Step 1b
      *
-     * Step 1a : createStopStreamTask() Internal function call from the super app callback
-     *          (after created Stream in which also a stream will be created to the receiver)
-     *          - will create a gelato timed task that will lauchh with start-time at the desired duration of the stream
+     * Step 1a : planStream() Public function called by the user
+     *          - msg.sender will grant full stream permissions to contract
+     *          - will create a gelato timed task that will lauchh with start-time at the desired stream start
      *          - will store the taskId
      *
-     * Step 2a : checkerStopStream() Function.
-     *          - always return "canExec = true" as we are only waiting to the time to execure
-     *          - returns the execPayload of stopStream()
+     * Step 2a : checkerPlanStream() Function.
+     *          - always return "canExec = true" as we are only waiting to the time to execute
+     *          - returns the execPayload of startStream()
      *
-     * Step 3a and 1b : Executable Function: stopStream()
-     *                  - will stop the outcoming stream from super app to receiver
-     *                  - will stop the incoming stream from sender to super app
-     *                  - will cancel the task so it only
+     * Step 3a and 1b : Executable Function: startStream()
+     *                  - will create a stream from sender to receiver (contrat has acl permissions)
+     *                  - will cancel the task so it only run once
+     *                  - will create a timed task to stop the stream
+     *                  - will store the new taskId
      *
-     * Step 2b:
+     * Step 2b: checkerStopPlanStream() function
+     *          - always return "canExec = true" as we are only waiting to the time to execute
+     *          - returns the execPayload of stopPlannedStream()
      *
-     *
-     * Step 3
+     * Step 3: Executable Function: stopPlannedStream()
+     *          - will stop the stream between sender and recevier
+     *          - will cabcel the task so it only runs once
+     *          
      *************************************************************************/
     
     function planStream(PlanStream memory config) external {
-        console.log(block.timestamp + config.plannedStart);
 
         bytes32 taskId = IOps(ops).createTimedTask(
-            uint128(block.timestamp + config.plannedStart),
-            3600,
-            address(this),
-            this.startStream.selector,
-            address(this),
+            uint128(block.timestamp + config.plannedStart), //// timestamp at which the task should be first  executed (stream should start)
+            3600, /// Interval between executions, we will cancel after the first
+            address(this), /// Contract executing the task 
+            this.startStream.selector, /// Executable function's selector
+            address(this), /// Resolver contract, in our case will be the same
             abi.encodeWithSelector(
                 this.checkerPlanStream.selector,
                 config.stream
-            ),
-           ETH,
-            true
+            ), /// Checker Condition
+           ETH,  ///  feetoken
+           true /// we will use the treasury contract for funding 
         );
         taskIdByUser[config.stream.sender] = taskId;
-        console.logBytes32(taskId);
+ 
     }
 
     function checkerPlanStream(StreamConfig memory stream)
         external
-        view
+        pure
         returns (bool canExec, bytes memory execPayload)
     {
         canExec = true;
-        console.log(stream.receiver);
         execPayload = abi.encodeWithSelector(this.startStream.selector, stream);
     }
 
     function startStream(StreamConfig memory stream) external onlyOps {
         // bytes memory userData = abi.encode(stream.duration,stream.receiver);
-        console.log(stream.sender);
-        console.log(stream.receiver);
-        console.log("streaming start");
+  
         _cfaLib.createFlowByOperator(
             stream.sender,
             stream.receiver,
@@ -357,7 +358,7 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
         //// create new timed at
 
         bytes32 taskId = IOps(ops).createTimedTask(
-            uint128(block.timestamp + stream.duration),
+            uint128(block.timestamp + stream.duration),//// timestamp at which the task should be first executed (stream should stop)
             3600,
             address(this),
             this.stopPlannedStream.selector,
@@ -394,7 +395,7 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
         /////// STOP IF EXISTS incoming stream
         (, int96 inFlowRate, , ) = cfa.getFlow(superToken, sender, receiver);
 
-        console.log(uint96(inFlowRate));
+     
         if (inFlowRate > 0) {
             host.callAgreement(
                 cfa,

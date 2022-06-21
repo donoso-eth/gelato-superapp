@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/gelato-superapp",
+    "public": "dist/gelato",
     "ignore": [
       "firebase.json",
       "**/.*",

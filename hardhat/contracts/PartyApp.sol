@@ -92,7 +92,7 @@ contract PartyApp is OpsReady, Ownable {
    *          - will store the taskId
    *
    * Step 2 : checkerstartParty() Function.
-   *          - Check If the task can be executed , in rhis case if we have not headache
+   *          - Check If the task can be executed , in rhis case if we don't headache
    *          - returns the execPayload of startParty()
    *
    * Step 3 : Executable Function: startParty()
@@ -130,32 +130,34 @@ contract PartyApp is OpsReady, Ownable {
 
   // #endregion Create Simple Task Use Case Business Logic
 
+
   // ============= ============= Create Task and Cancel after one execution Use Case Business Logic  ============= ============= //
   // #region  Create Task and Cancel after one executio
 
   /**************************************************************************
    * Stop Stream Use Case Business Logic
+   * Similar case as the first create imple task, the difference is that 
+   * we are cancelling the task (it will only run once) after first execution
    *
-   * Step 1 : createTask()
+   * Step 1 : ccreateTaskAndCancel()
    *          - will create a gelato task
    *          - will store the taskId
    *
-   * Step 2 : checkerstartParty() Function.
-   *          - Check If the task can be executed , in rhis case if we have not headache
-   *          - returns the execPayload of startParty()
+   * Step 2 : checkerCancel() Function.
+   *          - Check If the task can be executed , in rhis case if we don't have headache
+   *          - returns the execPayload of startPartyandCancel
    *
-   * Step 3 : Executable Function: startParty()
+   * Step 3 : Executable Function: startPartyandCancel
    *          - will Start the party setting lastPartyStrt to block.timestamo
    *          - will cause a headache
    *************************************************************************/
 
   function createTaskAndCancel() public {
     bytes32 taskId = IOps(ops).createTask(
-      address(this),
-      /// sdad
-      this.startPartyandCancel.selector,
-      address(this),
-      abi.encodeWithSelector(this.checkerCancel.selector, msg.sender)
+      address(this), /// Contract executing the task
+      this.startPartyandCancel.selector, /// Executable function's selector
+      address(this), /// Resolver contract, in our case will be the same
+      abi.encodeWithSelector(this.checkerCancel.selector, msg.sender) /// Checker Condition
     );
     taskIdByUser[msg.sender] = taskId;
   }
@@ -189,6 +191,8 @@ contract PartyApp is OpsReady, Ownable {
 
   /**************************************************************************
    * Stop Stream Use Case Business Logic
+   * The difference with the simple create task is we will transfer the execution gas fees
+   * at the time of execution, for that we will require our contract to hold balance
    *
    * Step 1 : createTaskNoPrepayment()
    *          - requiere the contract to have funds or to receive funds
