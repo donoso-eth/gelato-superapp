@@ -236,7 +236,7 @@ contract PartyApp is OpsReady, Ownable {
   {
       canExec = headachePresent == false;
 
-    execPayload = abi.encodeWithSelector(this.startParty.selector);
+    execPayload = abi.encodeWithSelector(this.startPartyNoPrepayment.selector);
   }
 
   function startPartyNoPrepayment() external onlyOps {

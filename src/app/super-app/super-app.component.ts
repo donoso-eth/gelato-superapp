@@ -30,9 +30,9 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
   startCtrl: FormControl = new FormControl();
   streamDuration = [
 
-    { name: '5 min', id: 1, factor: 300 },
-    { name: '10 min', id: 2, factor: 600 },
-    { name: '15 min', id: 3, factor: 900 },
+    { name: '15 min', id: 1, factor: 900 },
+    { name: '30 min', id: 2, factor: 1800 },
+    { name: '45 min', id: 3, factor: 2700 },
   ];
   superAppBalance: any;
   bonusGranted = false;
@@ -154,7 +154,7 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
   }
 
   async getTaskId(){
-    let id = await this.dapp.DAPP_STATE.partyAppContract?.instance.taskIdByUser(this.signerAdress)
+    let id = await this.dapp.DAPP_STATE.gelatoSuperAppContract?.instance.taskIdByUser(this.signerAdress)
     console.log(id)
     this.taskId = id;
   }
