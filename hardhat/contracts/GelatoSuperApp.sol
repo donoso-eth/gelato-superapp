@@ -199,8 +199,8 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
         address to
     ) internal {
         bytes32 taskId = IOps(ops).createTimedTask(
-            uint128(duration), //// timestamp at which the task should be first  executed (stream should stop)
-            3600, /// Interval between executions, we will cancel after the first
+            uint128(block.timestamp + duration), //// timestamp at which the task should be first  executed (stream should stop)
+            600, /// Interval between executions, we will cancel after the first
             address(this), /// Contract executing the task
             this.stopStream.selector,  /// Executable function's selector
             address(this), /// Resolver contract, in our case will be the same
@@ -314,7 +314,7 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
     function planStream(PlanStream memory config) external {
 
         bytes32 taskId = IOps(ops).createTimedTask(
-            uint128(config.plannedStart), //// timestamp at which the task should be first  executed (stream should start)
+            uint128(block.timestamp + config.plannedStart), //// timestamp at which the task should be first  executed (stream should start)
             600, /// Interval between executions, we will cancel after the first
             address(this), /// Contract executing the task 
             this.startStream.selector, /// Executable function's selector
@@ -358,7 +358,7 @@ contract GelatoSuperApp is SuperAppBase, OpsReady, Ownable {
         //// create new timed at
 
         bytes32 taskId = IOps(ops).createTimedTask(
-            uint128(stream.duration),//// timestamp at which the task should be first executed (stream should stop)
+            uint128(block.timestamp + stream.duration),//// timestamp at which the task should be first executed (stream should stop)
             600, /// Interval between executions, we will cancel after the first execution
             address(this), /// /// Contract executing the task 
             this.stopPlannedStream.selector, /// Executable function's selector

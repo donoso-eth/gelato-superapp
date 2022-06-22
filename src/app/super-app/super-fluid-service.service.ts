@@ -68,8 +68,8 @@ export class SuperFluidService {
         await this.initializeFramework()
       }
 
-      await this.sf.cfaV1.authorizeFlowOperatorWithFullControl({flowOperator ,superToken:token})
-    
+     let aclOperation  =  await this.sf.cfaV1.authorizeFlowOperatorWithFullControl({flowOperator ,superToken:token})
+     await aclOperation.exec(this.dapp.signer!)
   
   }
 

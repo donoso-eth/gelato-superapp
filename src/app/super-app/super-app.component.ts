@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { utils } from 'ethers';
+import { PlanStreamStruct } from 'src/assets/contracts/interfaces/GelatoSuperApp';
 import { ITaskTreasury } from 'src/assets/contracts/interfaces/ITaskTreasury';
 import { ITaskTreasury__factory } from 'src/assets/contracts/interfaces/ITaskTreasury__factory';
 import { DappBaseComponent } from '../dapp-injector/classes';
@@ -63,14 +64,13 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
     }
     this.store.dispatch(Web3Actions.chainBusy({ status: true }));
     let flowRate = ((10 * 10 ** 18) / (24 * 3600)).toFixed(0); // 10 tokens per day
-    let duration = 3000;
-    console.log(receiver);
+    let duration = this.durationCtrl.value.factor
+
+
     let data = utils.defaultAbiCoder.encode(
       ['address', 'uint256'],
       [receiver, duration]
     );
-    let deco = utils.defaultAbiCoder.decode(['address', 'uint256'], data);
-    console.log(deco);
 
     const config: {
       flowRate: string;
@@ -90,7 +90,37 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
  
   }
 
-  async planStartAndStopStream() {}
+  async planStartAndStopStream() {
+    let receiver: string = this.receiveCtrl.value;
+    if (isAddress(receiver) == false) {
+      alert('addresse is not valid');
+      return;
+    }
+      
+    await this.superfluidService.approveOperator(this.superToken, this.dapp.DAPP_STATE.gelatoSuperAppContract?.address!);
+    
+    let duration = this.durationCtrl.value.factor
+      let start = this.startCtrl.value.factor
+      let flowRate = ((10 * 10 ** 18) / (24 * 3600)).toFixed(0); // 10 tokens per day
+
+      let planStreamConfig: PlanStreamStruct = {
+        plannedStart: start,
+        stream: {
+          sender: this.dapp.signerAddress!,
+          receiver: this.receiveCtrl.value,
+          duration: duration,
+          flowRate,
+        },
+      };
+
+
+    this.store.dispatch(Web3Actions.chainBusy({ status: true }));
+
+    await doSignerTransaction(this.dapp.DAPP_STATE.gelatoSuperAppContract?.instance.planStream(planStreamConfig)!)
+   
+    this.refresh()
+
+  }
 
   override async hookContractConnected(): Promise<void> {
     this.contractaddress = this.dapp.DAPP_STATE.gelatoSuperAppContract?.address!;
@@ -162,7 +192,7 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
 
 async cancelTask(){
   await doSignerTransaction(this.dapp.DAPP_STATE.gelatoSuperAppContract?.instance.cancelTask()!)
-  this.refresh
+  this.refresh()
 }
 
   async refresh() {
@@ -170,7 +200,7 @@ async cancelTask(){
     await this.getTreasuryBalance();
     await this.getSuperAppBalance();
     await this.getTaskId()
-    if (this.bonusGranted !== false){
+       if (this.bonusGranted == undefined ||this.bonusGranted == false){
     this.bonusGranted = await this.dapp.DAPP_STATE.gelatoSuperAppContract?.instance.isBonusReady()!
     }
     this.store.dispatch(Web3Actions.refreshBalances({ refreshBalance: false}));
