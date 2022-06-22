@@ -30,7 +30,7 @@ task('mumbai-verify', 'verify').setAction(async ({}, hre) => {
   const gelatoSuperApp = JSON.parse(readFileSync(`${contract_path}/${toDeployContract.jsonName}_metadata.json`,'utf-8'))
 
   await hre.run("verify:verify", {
-    address: gelatoSuperApp.addresse,
+    address: gelatoSuperApp.address,
     constructorArguments: [
       '0xEB796bdb90fFA0f28255275e16936D25d3418603',
       '0x5D8B4C2554aeB7e86F387B4d6c00Ac33499Ed01f',
