@@ -3,9 +3,8 @@
 This project showcases general-purpose examples of automating smart contracts with gelato as well as the application for superfluid streams presenting a very simple 3-step guide to creating programmable cash flows
 
 ## Showcase Dapp
-The showcase dapp can be found in:
-The two contracts are deployed anda verified on Mumbai
-
+The showcase dapp can be found in [dapp](https://gelato-superapp.web.app/party)
+The two contracts are deployed anda verified on Mumbai [PartyApp](https://mumbai.polygonscan.com/address/0x91946A25711aD12636C08953fF40f01d9303318f) and [GelatoSuperApp](https://mumbai.polygonscan.com/address/0x5e12E82e1abD457F81F90109dB743d71799C4aA0)
 
 
 
