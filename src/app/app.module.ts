@@ -34,7 +34,7 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    DappInjectorModule.forRoot({wallet:'wallet', defaultNetwork:'mumbai'}),
+    DappInjectorModule.forRoot({wallet:'local', defaultNetwork:'localhost'}),
     StoreModule.forRoot({web3: we3ReducerFunction}),
     FormsModule,
     ReactiveFormsModule,

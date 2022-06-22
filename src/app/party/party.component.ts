@@ -28,6 +28,7 @@ export class PartyComponent extends DappBaseComponent implements OnInit {
   contractCtrl  = new FormControl(); 
   msgValueCtrl  = new FormControl(); 
   lastPartyStart!: string;
+  taskId: string | undefined;
 
   constructor(dapp: DappInjector, store: Store) {
     super(dapp, store);
@@ -41,7 +42,7 @@ export class PartyComponent extends DappBaseComponent implements OnInit {
     await doSignerTransaction(
       this.dapp.partyAppContract?.instance.createTask()!
     );
-    this.store.dispatch(Web3Actions.chainBusy({ status: false }));
+    this.refresh()
   }
 
   async cancelTask() {
@@ -49,7 +50,8 @@ export class PartyComponent extends DappBaseComponent implements OnInit {
     await doSignerTransaction(
       this.dapp.partyAppContract?.instance.cancelTask()!
     );
-    this.store.dispatch(Web3Actions.chainBusy({ status: false }));
+    this.refresh()
+ 
   }
 
   async createTaskAndCancel() {
@@ -57,12 +59,12 @@ export class PartyComponent extends DappBaseComponent implements OnInit {
     await doSignerTransaction(
       this.dapp.partyAppContract?.instance.createTaskAndCancel()!
     );
-    this.store.dispatch(Web3Actions.chainBusy({ status: false }));
+    this.refresh()
   }
 
 
   async createTaskNoPrepayment(){
-    console.log( this.msgValueCtrl.value)
+    console.log('no prepayment')
     this.store.dispatch(Web3Actions.chainBusy({ status: true }));
     if (this.msgValueCtrl.value == 0 || this.msgValueCtrl.value == undefined){
     await doSignerTransaction(
@@ -74,7 +76,7 @@ export class PartyComponent extends DappBaseComponent implements OnInit {
         this.dapp.partyAppContract?.instance.createTaskNoPrepayment({value})!
       );
     }
-    this.store.dispatch(Web3Actions.chainBusy({ status: false }));
+    this.refresh()
   }
 
 
@@ -92,10 +94,9 @@ export class PartyComponent extends DappBaseComponent implements OnInit {
   };
   this.store.dispatch(Web3Actions.chainBusy({ status: true }));
    const transaction = await this.dapp.signer!.sendTransaction(tx);
-   this.store.dispatch(Web3Actions.refreshBalances({refreshBalance:true}));
    await this.refresh()
    this.store.dispatch(Web3Actions.refreshBalances({refreshBalance:false}));
-   this.store.dispatch(Web3Actions.chainBusy({ status: false }));
+  
   }
 
   async withdrawContract() {
@@ -103,7 +104,7 @@ export class PartyComponent extends DappBaseComponent implements OnInit {
     await doSignerTransaction(
       this.dapp.partyAppContract?.instance.withdrawContract()!
     );
-    this.store.dispatch(Web3Actions.refreshBalances({refreshBalance:true}));
+;
     await this.refresh();
     this.store.dispatch(Web3Actions.refreshBalances({refreshBalance:false}));
     this.store.dispatch(Web3Actions.chainBusy({ status: false }));
@@ -123,7 +124,7 @@ export class PartyComponent extends DappBaseComponent implements OnInit {
     );
      this.store.dispatch(Web3Actions.refreshBalances({refreshBalance:true}));
     await this.refresh();
-    this.store.dispatch(Web3Actions.chainBusy({ status: false }));
+
   }
 
   async treasuryDeposit() {
@@ -133,13 +134,13 @@ export class PartyComponent extends DappBaseComponent implements OnInit {
     }
 
     let value = utils.parseEther(this.treasuryCtrl.value.toString());
-    this.store.dispatch(Web3Actions.chainBusy({ status: true }));
+ 
     await doSignerTransaction(
       this.dapp.partyAppContract?.instance.fundGelato(value, { value: value })!
     );
     await this.refresh();
     this.store.dispatch(Web3Actions.refreshBalances({ refreshBalance: true }));
-    this.store.dispatch(Web3Actions.chainBusy({ status: false }));
+
   }
 
   //  #endregion TREASURY Interaction
@@ -151,7 +152,6 @@ export class PartyComponent extends DappBaseComponent implements OnInit {
       this.taskTreasury,
       this.dapp.signer!
     );
-
   
     this.store.dispatch(Web3Actions.refreshBalances({ refreshBalance: true }));
     this.refresh();
@@ -198,18 +198,31 @@ export class PartyComponent extends DappBaseComponent implements OnInit {
   async getLastPartyStart() {
     let partyTimestamp =
       await this.dapp.partyAppContract?.instance.lastPartyStart();
-    console.log(+partyTimestamp!.toString());
+  
     this.lastPartyStart = new Date(
       1000 *
         +(await this.dapp.partyAppContract?.instance.lastPartyStart())!.toString()
     ).toLocaleString();
   }
 
+  async getTaskId(){
+    let id = await this.dapp.DAPP_STATE.partyAppContract?.instance.taskIdByUser(this.signerAdress)
+    console.log(id)
+    this.taskId = id;
+  }
+
   async refresh() {
+ 
+    this.store.dispatch(Web3Actions.chainBusy({ status: true }));
+
+    await this.getTaskId()
+   
     await this.getTreasuryBalance();
     await this.getPartyAppBalance();
     await this.getHeadache();
     await this.getLastPartyStart();
+    
+    this.store.dispatch(Web3Actions.chainBusy({ status: false }));
   }
 
   ngOnInit(): void {}

@@ -2,7 +2,7 @@
   <div class="col-12">
     <div class="card">
       <h5 class="text-center">
-        Gelato App  <i (click)="refresh()"
+       Party App  <i (click)="refresh()"
         class="pi pi-refresh"
         style="font-size: 1rem; cursor: pointer"
       ></i><br />
@@ -26,7 +26,15 @@
         />
         <img *ngIf="headache == false" style="width: 40px;margin-right:10px;" src="assets/images/no-headache.png" />
         <span>Last Party: {{lastPartyStart}} </span>
+      
       </div>
+      <div style="text-align:center">
+      <span  ><span style="font-weight: bold;">TaskId:</span> {{taskId}}         <i
+        class="pi pi-copy"
+        style="font-size: 1rem; cursor: pointer"
+        [cdkCopyToClipboard]="taskId!"
+      ></i></span>
+    </div>
       <p-divider> </p-divider>
       <div class="grid">
         <div

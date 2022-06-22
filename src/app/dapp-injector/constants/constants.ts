@@ -102,7 +102,7 @@ export const NETWORKS:{[key:string]: INETWORK} = {
     chainId: 80001,
     price: 1,
     gasPrice: 1000000000,
-    rpcUrl: "https://rpc-mumbai.maticvigil.com",
+    rpcUrl: "https://speedy-nodes-nyc.moralis.io/6e874b0f13667e6fd8583112/polygon/mumbai",//https://polygon-mumbai.g.alchemy.com/v2/P2lEQkjFdNjdN0M_mpZKB8r3fAa2M0vT",
     faucet: "https://faucet.polygon.technology/",
     blockExplorer: "https://mumbai.polygonscan.com/",
   },

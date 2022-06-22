@@ -275,7 +275,7 @@ describe('Party app Tests', function () {
     resolverHash
   );
 
-  await partyApp.cancelTaskById(taskId);
+  await partyApp.cancelTaskById(taskId,deployerAddress);
  
    taskByUser = await ops.getTaskIdsByUser(partyApp.address)
    expect(taskByUser.length).to.equal(0);
@@ -288,6 +288,71 @@ describe('Party app Tests', function () {
 
   });
 
+ // ============= ============= Create Simple Task and cancel adter first execution Use Case Business Logic  ============= ============= //
+
+ it('it should create a task and cancel after first exec', async () => { 
+ 
+  const depositAmount = ethers.utils.parseEther('10');
+  await partyApp.fundGelato(depositAmount, { value: depositAmount });
+ 
+  await partyApp.headacheFinish();
+
+  await partyApp.createTaskAndCancel()
+
+
+  execData = await partyApp.interface.encodeFunctionData('startPartyandCancel',[deployerAddress]);
+  execAddress = partyApp.address;
+  execSelector = await ops.getSelector('startPartyandCancel(address)');
+  resolverAddress = partyApp.address;
+  resolverData = await partyApp.interface.encodeFunctionData(
+    'checkerCancel',[deployerAddress]
+  )
+
+  resolverHash = ethers.utils.keccak256(
+    new ethers.utils.AbiCoder().encode(
+      ['address', 'bytes'],
+      [resolverAddress, resolverData]
+    )
+  );
+
+  taskId = await ops.getTaskId(
+    partyApp.address,
+    execAddress,
+    execSelector,
+    true,
+    ethers.constants.AddressZero,
+    resolverHash
+  );
+
+
+    let storeId = await partyApp.taskIdByUser(deployerAddress)
+    expect(taskId).equal(storeId)
+
+
+  
+    await  ops
+    .connect(executor)
+    .exec(
+      ethers.utils.parseEther('0.1'),
+      ETH,
+      partyApp.address,
+      true,
+      true,
+      resolverHash,
+      execAddress,
+      execData
+    )
+
+
+      storeId = await partyApp.taskIdByUser(deployerAddress)
+    
+      expect(storeId).to.equal(ethers.utils.hexZeroPad(ethers.utils.hexlify(0), 32))
+
+      let taskByUser = await ops.getTaskIdsByUser(partyApp.address)
+
+      expect(taskByUser.length).to.equal(0);
+
+});
 
  // ============= ============= Create Simple Task WITHOUT Prepayment Use Case Business Logic  ============= ============= //
  it('it should revert when Contract has no funds ', async () => { 

@@ -1,138 +1,219 @@
 <div class="grid">
-    <div class="col-12">
-        <div class="card">
-            <h5 class="text-center">Gelato Super App<br>
-                <span *ngIf="!!contractaddress" style="font-size: smaller">{{ displayAdress(contractaddress) }}
-                </span>
-                <i class="pi pi-copy" style="font-size: 1rem; cursor: pointer"
-                    [cdkCopyToClipboard]="contractaddress"></i>
-                <br />
-                <span *ngIf="!!superAppBalance">{{ utils.formatEther(superAppBalance!) }} ETH
-                </span>
+  <div class="col-12">
+    <div class="card">
+      <h5 class="text-center">
+        Gelato Super App<br />
+        <span *ngIf="!!contractaddress" style="font-size: smaller"
+          >{{ displayAdress(contractaddress) }}
+        </span>
+        <i
+          class="pi pi-copy"
+          style="font-size: 1rem; cursor: pointer"
+          [cdkCopyToClipboard]="contractaddress"
+        ></i>
+        <i
+          (click)="refresh()"
+          class="pi pi-refresh"
+          style="font-size: 1rem; cursor: pointer"
+        ></i>
+        <br />
+        <span *ngIf="!!superAppBalance"
+          >{{ utils.formatEther(superAppBalance!) }} ETH
+        </span>
+      </h5>
+      <div style="text-align: center">
+        <span
+          ><span style="font-weight: bold">TaskId:</span> {{ taskId }}
+          <i
+            class="pi pi-copy"
+            style="font-size: 1rem; cursor: pointer"
+            [cdkCopyToClipboard]="taskId!"
+          ></i
+        ></span>
+      </div>
+      <p-divider> </p-divider>
+      <div class="grid p-fluid">
+        <div
+          class="col-5 flex align-items-center flex-column justify-content-start"
+        >
+          <div>
+            <h5 class="text-center">
+              Using Gelato Treasury <br />
+              <span *ngIf="!!contractaddress" style="font-size: smaller"
+                >{{ displayAdress(contractaddress) }}
+              </span>
+              <i
+                class="pi pi-copy"
+                style="font-size: 1rem"
+                [cdkCopyToClipboard]="contractaddress"
+              ></i>
+              <br />
+              <span *ngIf="!!treasurybalance"
+                >{{ utils.formatEther(treasurybalance) }} ETH
+              </span>
             </h5>
-            <p-divider> </p-divider>
-            <div class="grid p-fluid">
-                <div class="col-5 flex align-items-center flex-column justify-content-start">
-                    <div>
-                        <h5 class="text-center">Using Gelato Treasury <br>
-                            <span *ngIf="!!contractaddress"
-                                style="font-size: smaller;">{{displayAdress(contractaddress)}} </span> <i
-                                class="pi pi-copy" style="font-size: 1rem" [cdkCopyToClipboard]="contractaddress "></i>
-                            <br />
-                            <span *ngIf="!!treasurybalance">{{ utils.formatEther(treasurybalance) }} ETH
-                            </span>
-                        </h5>
-
-                    </div>
-                    <div class="grid p-fluid">
-                        <div class="col-8">
-                            <p-inputNumber mode="decimal" [step]="0.1" [formControl]="treasuryCtrl" [showButtons]="true"
-                                placeholder="Fund Treasury" [min]="0" [max]="100">
-                            </p-inputNumber>
-
-                        </div>
-                        <div class="col-4">
-                            <p-button (click)="treasuryDeposit()" label="Fund" class="mt-2"></p-button>
-                        </div>
-
-                        <div class="col-12">
-                            <button (click)="widthDrawTreasury()" pButton pRipple type="button" label="withdraw"
-                                class="p-button-raised p-button-warning mr-2 mb-2"></button>
-
-                        </div>
-
-                        <p-divider class="col-12" layout="horizontal">
-
-                        </p-divider>
-                        <user-balance *ngIf="blockchain_status == 'wallet-connected'"></user-balance>
-                    </div>
-                </div>
-
-                <p-divider layout="vertical">
-
-                </p-divider>
-
-
-                <div class="col-6 flex align-items-center flex-column justify-content-start">
-                    <div class=" col-12 p-inputgroup">
-
-                        <input [formControl]="receiveCtrl" pInputText type="text" placeholder="Receiver" />
-                    </div>
-
-                    <div  class="col-12">
-                        <p-dropdown [options]="streamDuration" [formControl]="durationCtrl"
-                            placeholder="Stop stream in">
-                            <ng-template pTemplate="selectedItem">
-                                <div style="display:inline-flex" class="country-item country-item-value">
-                                    <div>{{durationCtrl.value.name}}</div>
-                                </div>
-                            </ng-template>
-                            <ng-template let-duration pTemplate="duration">
-                                <div class="flex align-items-center">
-
-                                    <span>{{duration.name}}</span>
-                                </div>
-                            </ng-template>
-                        </p-dropdown>
-                    </div>
-
-                    <div class="col-12">
-                        <p-button (click)="startStream()" label="Create Stream and Automate Stop" class="mt-2"></p-button>
-
-                    </div>
-
-                    <h1 *ngIf="bonusGranted==false" style="font-size:350px;">?</h1>
-             
-             
-                    <h5 *ngIf="bonusGranted==true" class="text-center">Bonus !! <br>
-                        Automate Start and Stop Stream
-                    </h5>
-
-                    <div  *ngIf="bonusGranted==true" class="grid p-fluid">
-                        <div class=" col-12 p-inputgroup">
-
-                            <input [formControl]="receiveCtrl" pInputText type="text" placeholder="Receiver" />
-                        </div>
-                        <div class="col-12">
-                            <p-dropdown [options]="streamDuration" [formControl]="startCtrl"
-                                placeholder="Start Stream in">
-                                <ng-template pTemplate="selectedItem">
-                                    <div style="display:inline-flex" class="country-item country-item-value">
-                                        <div>{{startCtrl.value.name}}</div>
-                                    </div>
-                                </ng-template>
-                                <ng-template let-duration pTemplate="duration">
-                                    <div class="flex align-items-center">
-
-                                        <span>{{duration.name}}</span>
-                                    </div>
-                                </ng-template>
-                            </p-dropdown>
-                        </div>
-                        <div class="col-12">
-                            <p-dropdown [options]="streamDuration" [formControl]="durationCtrl"
-                                placeholder="Stream Duration">
-                                <ng-template pTemplate="selectedItem">
-                                    <div style="display:inline-flex" class="country-item country-item-value">
-                                        <div>{{durationCtrl.value.name}}</div>
-                                    </div>
-                                </ng-template>
-                                <ng-template let-duration pTemplate="duration">
-                                    <div class="flex align-items-center">
-
-                                        <span>{{duration.name}}</span>
-                                    </div>
-                                </ng-template>
-                            </p-dropdown>
-                        </div>
-                        <div class="col-12">
-                            <p-button (click)="startStream()" label="Create Automated Stream" class="mt-2"></p-button>
-
-                        </div>
-                    </div>
-                </div>
+          </div>
+          <div class="grid p-fluid">
+            <div class="col-8">
+              <p-inputNumber
+                mode="decimal"
+                [step]="0.1"
+                [formControl]="treasuryCtrl"
+                [showButtons]="true"
+                placeholder="Fund Treasury"
+                [min]="0"
+                [max]="100"
+              >
+              </p-inputNumber>
+            </div>
+            <div class="col-4">
+              <p-button
+                (click)="treasuryDeposit()"
+                label="Fund"
+                class="mt-2"
+              ></p-button>
             </div>
 
+            <div class="col-12">
+              <button
+                (click)="widthDrawTreasury()"
+                pButton
+                pRipple
+                type="button"
+                label="withdraw"
+                class="p-button-raised p-button-warning mr-2 mb-2"
+              ></button>
+            </div>
+
+            <p-divider class="col-12" layout="horizontal"> </p-divider>
+            <user-balance
+              *ngIf="blockchain_status == 'wallet-connected'"
+            ></user-balance>
+          </div>
         </div>
+
+        <p-divider layout="vertical"> </p-divider>
+
+        <div
+          class="col-6 flex align-items-center flex-column justify-content-start"
+        >
+          <div class="col-12 p-inputgroup">
+            <input
+              [formControl]="receiveCtrl"
+              pInputText
+              type="text"
+              placeholder="Receiver"
+            />
+          </div>
+
+          <div class="col-12">
+            <p-dropdown
+              [options]="streamDuration"
+              [formControl]="durationCtrl"
+              placeholder="Stop stream in"
+            >
+              <ng-template pTemplate="selectedItem">
+                <div
+                  style="display: inline-flex"
+                  class="country-item country-item-value"
+                >
+                  <div>{{ durationCtrl.value.name }}</div>
+                </div>
+              </ng-template>
+              <ng-template let-duration pTemplate="duration">
+                <div class="flex align-items-center">
+                  <span>{{ duration.name }}</span>
+                </div>
+              </ng-template>
+            </p-dropdown>
+          </div>
+
+          <div class="col-12">
+            <p-button
+              (click)="startStream()"
+              label="Create Stream and Automate Stop"
+              class="mt-2"
+            ></p-button>
+          </div>
+
+          <div class="col-12">
+            <button
+              pButton
+              pRipple
+              (click)="cancelTask()"
+              label="Cancel Task"
+              class="p-button-raised p-button-danger mr-2 mb-2"
+            ></button>
+          </div>
+
+          <h1 *ngIf="bonusGranted == false" style="font-size: 350px">?</h1>
+
+          <h5 *ngIf="bonusGranted == true" class="text-center">
+            Bonus !! <br />
+            Automate Start and Stop Stream
+          </h5>
+
+          <div *ngIf="bonusGranted == true" class="grid p-fluid">
+            <div class="col-12 p-inputgroup">
+              <input
+                [formControl]="receiveCtrl"
+                pInputText
+                type="text"
+                placeholder="Receiver"
+              />
+            </div>
+            <div class="col-12">
+              <p-dropdown
+                [options]="streamDuration"
+                [formControl]="startCtrl"
+                placeholder="Start Stream in"
+              >
+                <ng-template pTemplate="selectedItem">
+                  <div
+                    style="display: inline-flex"
+                    class="country-item country-item-value"
+                  >
+                    <div>{{ startCtrl.value.name }}</div>
+                  </div>
+                </ng-template>
+                <ng-template let-duration pTemplate="duration">
+                  <div class="flex align-items-center">
+                    <span>{{ duration.name }}</span>
+                  </div>
+                </ng-template>
+              </p-dropdown>
+            </div>
+            <div class="col-12">
+              <p-dropdown
+                [options]="streamDuration"
+                [formControl]="durationCtrl"
+                placeholder="Stream Duration"
+              >
+                <ng-template pTemplate="selectedItem">
+                  <div
+                    style="display: inline-flex"
+                    class="country-item country-item-value"
+                  >
+                    <div>{{ durationCtrl.value.name }}</div>
+                  </div>
+                </ng-template>
+                <ng-template let-duration pTemplate="duration">
+                  <div class="flex align-items-center">
+                    <span>{{ duration.name }}</span>
+                  </div>
+                </ng-template>
+              </p-dropdown>
+            </div>
+            <div class="col-12">
+              <p-button
+                (click)="startStream()"
+                label="Create Automated Stream"
+                class="mt-2"
+              ></p-button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>

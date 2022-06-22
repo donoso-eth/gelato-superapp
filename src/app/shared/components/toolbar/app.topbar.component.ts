@@ -26,7 +26,7 @@ export class AppTopBarComponent extends DappBaseComponent {
     super(dapp, store);
     this.localUserCtrl.valueChanges.pipe(takeUntil(this.destroyHooks)).subscribe((val) => {
       this.dapp.localWallet(val);
-     // this.router.navigateByUrl('landing');
+   
     });
   }
 
@@ -42,17 +42,19 @@ export class AppTopBarComponent extends DappBaseComponent {
   
     this.store.dispatch(Web3Actions.chainBusy({ status: true }));
    this.store.dispatch(Web3Actions.disconnectChain({ status: 'force-disconnect' }));
-      this.router.navigate(['landing'])
+  
   }
 
 
   async  connect() {
 
-   // this.dapp.localWallet(1)
-  
-    this.dapp.launchWebModal()
-   
-    // this.router.navigate(['party'])
+    console.log(this.dapp.dappConfig.defaultNetwork!)
+
+    if (this.dapp.dappConfig.defaultNetwork! == "localhost") {
+      this.dapp.localWallet(1)
+    } else {
+      this.dapp.launchWebModal()
+    }  
       
     }
 

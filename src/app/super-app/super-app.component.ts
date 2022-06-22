@@ -36,6 +36,7 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
   ];
   superAppBalance: any;
   bonusGranted = false;
+  taskId: string | undefined;
 
   constructor(
     dapp: DappInjector,
@@ -152,10 +153,27 @@ export class SuperAppComponent extends DappBaseComponent implements OnInit {
     );
   }
 
+  async getTaskId(){
+    let id = await this.dapp.DAPP_STATE.partyAppContract?.instance.taskIdByUser(this.signerAdress)
+    console.log(id)
+    this.taskId = id;
+  }
+
+
+async cancelTask(){
+  await doSignerTransaction(this.dapp.DAPP_STATE.gelatoSuperAppContract?.instance.cancelTask()!)
+  this.refresh
+}
+
   async refresh() {
+    this.store.dispatch(Web3Actions.refreshBalances({ refreshBalance: true }));
     await this.getTreasuryBalance();
     await this.getSuperAppBalance();
+    await this.getTaskId()
+    if (this.bonusGranted !== false){
     this.bonusGranted = await this.dapp.DAPP_STATE.gelatoSuperAppContract?.instance.isBonusReady()!
-    console.log(this.bonusGranted)
+    }
+    this.store.dispatch(Web3Actions.refreshBalances({ refreshBalance: false}));
+   
   }
 }

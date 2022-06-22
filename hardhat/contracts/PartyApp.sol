@@ -49,9 +49,9 @@ contract PartyApp is OpsReady, Ownable {
     taskIdByUser[msg.sender] = bytes32(0);
   }
 
-  function cancelTaskById(bytes32 _taskId) public {
+  function cancelTaskById(bytes32 _taskId,address sender) public {
     IOps(ops).cancelTask(_taskId);
-    taskIdByUser[msg.sender] = bytes32(0);
+    taskIdByUser[sender] = bytes32(0);
   }
 
   function fundGelato(uint256 amount) public payable {
@@ -168,7 +168,6 @@ contract PartyApp is OpsReady, Ownable {
     returns (bool canExec, bytes memory execPayload)
   {
     canExec = headachePresent == false;
-
     execPayload = abi.encodeWithSelector(
       this.startPartyandCancel.selector,
       user
@@ -178,7 +177,9 @@ contract PartyApp is OpsReady, Ownable {
   function startPartyandCancel(address user) external onlyOps {
     require(headachePresent == false, "NOT_READY");
 
-    cancelTaskById(taskIdByUser[user]);
+
+    bytes32 id = taskIdByUser[user];
+    cancelTaskById(id,user);
     lastPartyStart = block.timestamp;
     headachePresent = true;
   }
@@ -217,6 +218,7 @@ contract PartyApp is OpsReady, Ownable {
       "NO_FUNDING"
     );
 
+ 
     bytes32 taskId = IOps(ops).createTaskNoPrepayment(
       address(this),
       this.startPartyNoPrepayment.selector,

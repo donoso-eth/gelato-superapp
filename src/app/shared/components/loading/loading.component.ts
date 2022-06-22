@@ -12,7 +12,7 @@ export class LoadingComponent implements OnChanges{
   @Input() public isBusy:boolean = true;
 
   ngOnChanges(changes: SimpleChanges): void {
-        console.log(this.isBusy)
+      
   }
 
 }

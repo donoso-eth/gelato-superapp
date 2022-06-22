@@ -22,7 +22,7 @@ export interface PartyAppInterface extends utils.Interface {
   functions: {
     "ETH()": FunctionFragment;
     "cancelTask()": FunctionFragment;
-    "cancelTaskById(bytes32)": FunctionFragment;
+    "cancelTaskById(bytes32,address)": FunctionFragment;
     "checkerCancel(address)": FunctionFragment;
     "checkerNoPrepayment()": FunctionFragment;
     "checkerStartParty()": FunctionFragment;
@@ -55,7 +55,7 @@ export interface PartyAppInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "cancelTaskById",
-    values: [BytesLike]
+    values: [BytesLike, string]
   ): string;
   encodeFunctionData(
     functionFragment: "checkerCancel",
@@ -266,6 +266,7 @@ export interface PartyApp extends BaseContract {
 
     cancelTaskById(
       _taskId: BytesLike,
+      sender: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -360,6 +361,7 @@ export interface PartyApp extends BaseContract {
 
   cancelTaskById(
     _taskId: BytesLike,
+    sender: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -452,6 +454,7 @@ export interface PartyApp extends BaseContract {
 
     cancelTaskById(
       _taskId: BytesLike,
+      sender: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -532,6 +535,7 @@ export interface PartyApp extends BaseContract {
 
     cancelTaskById(
       _taskId: BytesLike,
+      sender: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -620,6 +624,7 @@ export interface PartyApp extends BaseContract {
 
     cancelTaskById(
       _taskId: BytesLike,
+      sender: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
